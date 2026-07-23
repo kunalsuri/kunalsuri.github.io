@@ -1,52 +1,16 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { SITE_TITLE } from '../../src/consts';
+import { ensureDistBuilt } from './ensure-build';
 
 const DIST_DIR = path.resolve('dist');
 const RSS_PATH = path.join(DIST_DIR, 'rss.xml');
 
-/**
- * RSS feed integration tests.
- *
- * Validates the structure and content of the generated /rss.xml feed
- * after a build. Ensures the feed is well-formed, contains the expected
- * metadata, and correctly excludes draft posts.
- */
-
-function isDistFresh(): boolean {
-  const indexPath = path.join(DIST_DIR, 'index.html');
-  if (!fs.existsSync(indexPath) || !fs.existsSync(RSS_PATH)) return false;
-  const distMtime = fs.statSync(indexPath).mtimeMs;
-  const srcDir = path.resolve('src');
-
-  const checkFreshness = (dir: string): boolean => {
-    if (!fs.existsSync(dir)) return true;
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      const fullPath = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        if (!checkFreshness(fullPath)) return false;
-      } else if (fs.statSync(fullPath).mtimeMs > distMtime) {
-        return false;
-      }
-    }
-    return true;
-  };
-
-  return checkFreshness(srcDir);
-}
-
 beforeAll(() => {
-  if (!isDistFresh()) {
-    const astroBin = path.resolve('node_modules', 'astro', 'bin', 'astro.mjs');
-    execSync(`"${process.execPath}" "${astroBin}" build`, {
-      cwd: path.resolve('.'),
-      stdio: 'pipe',
-      timeout: 120_000,
-    });
-  }
+  ensureDistBuilt();
 }, 120_000);
+
 
 function getRssContent(): string {
   return fs.readFileSync(RSS_PATH, 'utf-8');

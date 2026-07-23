@@ -41,11 +41,11 @@ jobs:
       - name: Run unit tests
         run: npm run test:unit
 
-      - name: Run integration tests
-        run: npm run test:integration
-
       - name: Build site
         run: npm run build
+
+      - name: Run integration tests
+        run: npm run test:integration
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3

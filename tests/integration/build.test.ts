@@ -1,57 +1,14 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import { execSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
+import { ensureDistBuilt } from './ensure-build';
 
 const DIST_DIR = path.resolve('dist');
 
-/**
- * Build-output integration tests.
- *
- * These tests run `astro build` once and then validate the generated HTML files.
- * The suite is self-contained: if `dist/` already exists with a recent build,
- * it reuses it; otherwise it triggers a fresh build.
- *
- * NOTE: This suite is slower (~10-20 s for the build step). Run it with:
- *   npm run test:integration
- *   npm test                   (also includes unit tests)
- */
-
-/** Check if dist/ exists, has index.html, and is newer than any file in src/. */
-function isDistFresh(): boolean {
-  const indexPath = path.join(DIST_DIR, 'index.html');
-  if (!fs.existsSync(indexPath)) return false;
-  const distMtime = fs.statSync(indexPath).mtimeMs;
-  const srcDir = path.resolve('src');
-
-  const checkFreshness = (dir: string): boolean => {
-    if (!fs.existsSync(dir)) return true;
-    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-      const fullPath = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        if (!checkFreshness(fullPath)) return false;
-      } else if (fs.statSync(fullPath).mtimeMs > distMtime) {
-        return false;
-      }
-    }
-    return true;
-  };
-
-  return checkFreshness(srcDir);
-}
-
 beforeAll(() => {
-  if (!isDistFresh()) {
-    // Build the site. Use Astro directly (not `npm run build`) so we skip
-    // pagefind post-build — we only care about the Astro-generated HTML.
-    const astroBin = path.resolve('node_modules', 'astro', 'bin', 'astro.mjs');
-    execSync(`"${process.execPath}" "${astroBin}" build`, {
-      cwd: path.resolve('.'),
-      stdio: 'pipe',
-      timeout: 120_000, // 2-minute timeout
-    });
-  }
-}, 120_000); // Vitest timeout for this hook
+  ensureDistBuilt();
+}, 120_000);
+ // Vitest timeout for this hook
 
 /** Read a file from dist/ relative to the dist root. */
 function readDist(relativePath: string): string {

@@ -17,8 +17,8 @@ run() {
 
 run "Type check"          npm run check
 run "Unit tests"          npm run test:unit
-run "Integration tests"   npm run test:integration
 run "Production build"    npm run build
+run "Integration tests"   npm run test:integration
 
 echo ""
 echo "All checks passed. Safe to commit and push to main."

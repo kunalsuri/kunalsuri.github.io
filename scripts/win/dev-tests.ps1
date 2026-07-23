@@ -36,8 +36,8 @@ if (-not (Test-Path 'node_modules')) {
 $steps = @(
     @{ Name = 'Type check';           Command = 'npm run check' },
     @{ Name = 'Unit tests';           Command = 'npm run test:unit' },
-    @{ Name = 'Integration tests';    Command = 'npm run test:integration' },
-    @{ Name = 'Production build';     Command = 'npm run build' }
+    @{ Name = 'Production build';     Command = 'npm run build' },
+    @{ Name = 'Integration tests';    Command = 'npm run test:integration' }
 )
 foreach ($step in $steps) {
     Write-Host ""
