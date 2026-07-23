@@ -29,10 +29,20 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: 'npm'
 
       # Use `npm ci` for deterministic, reproducible builds from package-lock.json.
       - name: Install dependencies
         run: npm ci
+
+      - name: Type check (astro check)
+        run: npm run check
+
+      - name: Run unit tests
+        run: npm run test:unit
+
+      - name: Run integration tests
+        run: npm run test:integration
 
       - name: Build site
         run: npm run build
