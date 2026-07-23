@@ -1,0 +1,47 @@
+---
+import { SITE_TITLE, NAV_LINKS } from '../consts';
+import ThemeToggle from './ThemeToggle.astro';
+
+const pathname = Astro.url.pathname;
+const isActive = (href: string) =>
+  href === '/' ? pathname === '/' : pathname.startsWith(href);
+---
+
+<header
+  data-pagefind-ignore
+  class="flex items-center justify-between gap-4 py-6"
+>
+  <a href="/" class="inline-flex items-center gap-2.5" aria-label={`${SITE_TITLE} — home`}>
+    <span class="h-2 w-2 rounded-full bg-accent"></span>
+    <span class="font-display text-[1.05rem] font-extrabold tracking-tight">{SITE_TITLE}</span>
+  </a>
+
+  <nav class="flex items-center gap-0.5 sm:gap-1">
+    {
+      NAV_LINKS.map((link) => (
+        <a
+          href={link.href}
+          class:list={[
+            'rounded-md px-2 py-1 font-display text-sm font-medium transition-colors hover:text-accent',
+            isActive(link.href) ? 'text-ink' : 'text-muted',
+          ]}
+        >
+          {link.label}
+        </a>
+      ))
+    }
+
+    <a
+      href="/search"
+      aria-label="Search"
+      class="grid h-8 w-8 place-items-center rounded-md text-muted transition-colors hover:text-accent"
+    >
+      <svg class="h-[1.05rem] w-[1.05rem]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="7"></circle>
+        <path d="m21 21-4.3-4.3"></path>
+      </svg>
+    </a>
+
+    <ThemeToggle />
+  </nav>
+</header>

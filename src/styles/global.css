@@ -1,0 +1,412 @@
+@import "tailwindcss";
+
+/* ============================================================
+   Kunal Suri — the "Keynote" design system.
+   One idea in a spotlight: ink-on-paper by day, a lit stage by night.
+   Display: Bricolage Grotesque · Reading: Newsreader · Labels: mono.
+   Boldness is spent in ONE place (the spotlight); everything else is quiet.
+   ============================================================ */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --paper: #faf9f6;
+  --ink: #17150f;
+  --muted: #6c675d;
+  --surface: #f1efe8;
+  --line: #e6e3da;
+  --accent: #8a6a26; /* brass — only ever a mark, underline, or spotlight tint */
+  --accent-strong: #6f551d;
+  --spot: 208, 168, 92; /* spotlight rgb */
+  --spot-alpha: 0.13;
+}
+
+.dark {
+  --paper: #0a0a0b;
+  --ink: #ece7db;
+  --muted: #918b7e;
+  --surface: #151513;
+  --line: #24231f;
+  --accent: #d8b45f;
+  --accent-strong: #e7c67a;
+  --spot: 226, 190, 110;
+  --spot-alpha: 0.20;
+}
+
+/* Expose tokens AS Tailwind utilities that track the live variables, so
+   bg-paper / text-ink / text-muted / border-line / text-accent / font-*
+   all respond to the .dark class with no duplicated classes. */
+@theme inline {
+  --color-paper: var(--paper);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-surface: var(--surface);
+  --color-line: var(--line);
+  --color-accent: var(--accent);
+
+  --font-display: "Bricolage Grotesque", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --font-body: "Newsreader", Georgia, "Times New Roman", serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", "Segoe UI Mono", Menlo, Consolas, monospace;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-display);
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-synthesis-weight: none;
+  }
+  /* The stage: a faint top-glow vignette so dark mode reads as lit, not flat. */
+  .dark body {
+    background-image: radial-gradient(130% 90% at 50% -20%, #16150f 0%, var(--paper) 55%);
+    background-attachment: fixed;
+  }
+  ::selection {
+    background-color: color-mix(in oklab, var(--accent) 32%, transparent);
+    color: var(--ink);
+  }
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+}
+
+@layer components {
+  /* Mono eyebrow — the engineer's structural label. */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  /* THE SIGNATURE: a keynote spotlight behind a focal point. */
+  .spotlight { position: relative; isolation: isolate; }
+  .spotlight::before {
+    content: "";
+    position: absolute;
+    z-index: -1;
+    left: 50%;
+    top: -7rem;
+    width: min(94vw, 56rem);
+    aspect-ratio: 3 / 2;
+    transform: translateX(-50%);
+    background: radial-gradient(
+      50% 50% at 50% 45%,
+      rgba(var(--spot), var(--spot-alpha)) 0%,
+      rgba(var(--spot), 0) 72%
+    );
+    pointer-events: none;
+  }
+
+  /* Display headings. */
+  .display {
+    font-family: var(--font-display);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 0.98;
+    text-wrap: balance;
+  }
+  .hero-title { font-size: clamp(2.6rem, 7vw, 4.6rem); }
+  .post-title {
+    font-size: clamp(2.2rem, 5.5vw, 3.4rem);
+    line-height: 1.04;
+    letter-spacing: -0.028em;
+  }
+
+  .rule { height: 1px; background: var(--line); border: 0; }
+
+  /* List rows (posts, tags, archive). */
+  .row-title { transition: color 0.15s ease; }
+  .row-link:hover .row-title { color: var(--accent-strong); }
+
+  /* Reading prose — serif, generous 20px Medium-style editorial typography. */
+  .prose {
+    font-family: var(--font-body);
+    font-size: 1.25rem;
+    line-height: 1.76;
+    color: var(--ink);
+    text-wrap: pretty;
+    max-width: 700px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .prose > * + * { margin-top: 1.4em; }
+  .prose h2 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.75rem;
+    letter-spacing: -0.02em;
+    line-height: 1.18;
+    margin-top: 2.2em;
+    scroll-margin-top: 5rem;
+    text-wrap: balance;
+  }
+  .prose h3 {
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 1.35rem;
+    letter-spacing: -0.01em;
+    margin-top: 1.8em;
+    scroll-margin-top: 5rem;
+  }
+  .prose a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 3px;
+    transition: text-decoration-color 0.15s ease;
+  }
+  .prose a:hover { text-decoration-color: var(--ink); }
+  .prose strong { font-weight: 600; }
+  .prose ul { list-style: disc; padding-left: 1.3em; }
+  .prose ol { list-style: decimal; padding-left: 1.3em; }
+  .prose li + li { margin-top: 0.4em; }
+  .prose blockquote {
+    border-left: 2px solid var(--accent);
+    padding-left: 1.1rem;
+    font-style: italic;
+    color: var(--muted);
+  }
+  .prose code {
+    font-family: var(--font-mono);
+    font-size: 0.86em;
+    background: color-mix(in oklab, var(--muted) 16%, transparent);
+    padding: 0.15em 0.4em;
+    border-radius: 0.35em;
+  }
+  .prose pre {
+    position: relative;
+    font-family: var(--font-mono);
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 0.7rem;
+    padding: 1.1rem 1.2rem;
+    overflow-x: auto;
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+  .copy-code-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    padding: 0.2rem 0.5rem;
+    border-radius: 0.35rem;
+    background: var(--paper);
+    color: var(--muted);
+    border: 1px solid var(--line);
+    cursor: pointer;
+    transition: all 0.15s ease;
+    z-index: 10;
+  }
+  .copy-code-btn:hover {
+    color: var(--ink);
+    border-color: var(--accent);
+  }
+  .prose pre code { background: none; padding: 0; font-size: inherit; }
+  .prose hr { margin: 2.4em 0; height: 1px; background: var(--line); border: 0; }
+  .prose img {
+    border-radius: 0.7rem;
+    cursor: zoom-in;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  .prose img:hover {
+    transform: scale(1.01);
+  }
+  .prose h2, .prose h3 {
+    position: relative;
+  }
+  .prose .heading-anchor {
+    position: absolute;
+    left: -1.25em;
+    opacity: 0;
+    color: var(--muted);
+    font-weight: 400;
+    text-decoration: none;
+    transition: opacity 0.15s ease, color 0.15s ease;
+    padding-right: 0.25em;
+  }
+  .prose h2:hover .heading-anchor,
+  .prose h3:hover .heading-anchor {
+    opacity: 0.8;
+  }
+  .prose .heading-anchor:hover {
+    color: var(--accent);
+  }
+  .toc-link-active {
+    color: var(--accent) !important;
+    font-weight: 600 !important;
+    border-left: 2px solid var(--accent);
+    padding-left: 0.5rem;
+    margin-left: -0.5rem;
+  }
+  .prose table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 2rem 0;
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  @media (min-width: 768px) {
+    .prose table {
+      display: table;
+    }
+  }
+  .prose th {
+    font-weight: 700;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    border-bottom: 2px solid var(--line);
+    color: var(--ink);
+  }
+  .prose td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--line);
+    color: var(--muted);
+    transition: color 0.15s ease;
+  }
+  .prose tr:hover td {
+    color: var(--ink);
+  }
+  .prose tbody tr:nth-child(even) {
+    background-color: color-mix(in oklab, var(--surface) 35%, transparent);
+  }
+}
+
+/* Wide Full-Bleed Images & Captions */
+.prose figure {
+  margin: 2.2rem 0;
+}
+.prose figcaption {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 0.92rem;
+  text-align: center;
+  color: var(--muted);
+  margin-top: 0.6em;
+}
+@media (min-width: 1024px) {
+  .prose img.wide,
+  .prose figure.wide {
+    max-width: 900px;
+    width: calc(100% + 200px);
+    margin-left: -100px;
+    margin-right: -100px;
+  }
+}
+
+/* Tufte / Gwern Margin Sidenotes */
+.sidenote {
+  font-family: var(--font-display);
+  font-size: 0.84rem;
+  line-height: 1.48;
+  color: var(--muted);
+  background: color-mix(in oklab, var(--surface) 60%, transparent);
+  border-left: 2px solid var(--accent);
+  padding: 0.6rem 0.8rem;
+  border-radius: 0.4rem;
+  margin: 1.2rem 0;
+}
+@media (min-width: 1280px) {
+  .sidenote {
+    position: absolute;
+    right: -17.5rem;
+    width: 15rem;
+    margin-top: 0;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  }
+}
+
+/* Sticky Header Reading Bar */
+#sticky-nav-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 45;
+  background: color-mix(in oklab, var(--paper) 88%, transparent);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+  transform: translateY(-100%);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#sticky-nav-bar.active {
+  transform: translateY(0);
+}
+
+/* Lightbox Modal Overlay */
+.lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.lightbox-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.lightbox-overlay img {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: 0.5rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  transform: scale(0.95);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  cursor: zoom-out;
+}
+.lightbox-overlay.active img {
+  transform: scale(1);
+}
+
+/* Floating Clap Animation */
+@keyframes float-clap {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-2.5rem) scale(1.2);
+  }
+}
+.animate-float-clap {
+  animation: float-clap 0.75s ease-out forwards;
+}
+
+/* Page-load reveal: base state is VISIBLE (safe for reduced-motion);
+   the animation is a progressive enhancement only when motion is welcome. */
+@media (prefers-reduced-motion: no-preference) {
+  .reveal { opacity: 0; transform: translateY(0.5rem); animation: reveal 0.7s cubic-bezier(0.2, 0.7, 0.2, 1) forwards; }
+  .reveal-1 { animation-delay: 0.04s; }
+  .reveal-2 { animation-delay: 0.14s; }
+  .reveal-3 { animation-delay: 0.24s; }
+  .reveal-4 { animation-delay: 0.34s; }
+  @keyframes reveal { to { opacity: 1; transform: none; } }
+}
+

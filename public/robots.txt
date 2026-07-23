@@ -1,0 +1,27 @@
+User-agent: *
+Allow: /
+
+# Explicitly welcome AI Search Crawlers & LLM Agents
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Anthropic-ai
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+# Feeds & Directories
+Sitemap: https://kunalsuri.github.io/sitemap-index.xml
+RSS: https://kunalsuri.github.io/rss.xml
+LLMs-Directory: https://kunalsuri.github.io/llms.txt
+LLMs-FullText: https://kunalsuri.github.io/llms-full.txt

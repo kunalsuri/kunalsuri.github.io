@@ -1,0 +1,117 @@
+---
+// SelectionToolbar.astro — Medium-style floating selection action toolbar
+---
+
+<div
+  id="selection-toolbar"
+  class="fixed z-50 hidden -translate-x-1/2 -translate-y-full rounded-lg border border-line bg-paper/95 p-1.5 shadow-xl backdrop-blur-md transition-all duration-150 ease-out"
+  aria-label="Text selection actions"
+  data-pagefind-ignore
+>
+  <div class="flex items-center gap-1 font-mono text-xs text-muted">
+    <button
+      id="btn-quote-copy"
+      class="flex items-center gap-1.5 rounded-md px-2.5 py-1 transition-colors hover:bg-surface hover:text-accent focus:outline-none focus:ring-1 focus:ring-accent"
+      title="Copy selected text as formatted blockquote"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2H4c-1.25 0-2 .75-2 2v6c0 1.25.75 2 2 2h3c0 4-2 6-4 6z"></path>
+        <path d="M15 21c3 0 7-1 7-8V5c0-1.25-.756-2.017-2-2h-4c-1.25 0-2 .75-2 2v6c0 1.25.75 2 2 2h3c0 4-2 6-4 6z"></path>
+      </svg>
+      <span>Quote</span>
+    </button>
+
+    <div class="h-3 w-px bg-line" aria-hidden="true"></div>
+
+    <button
+      id="btn-share-x"
+      class="flex items-center gap-1.5 rounded-md px-2.5 py-1 transition-colors hover:bg-surface hover:text-accent focus:outline-none focus:ring-1 focus:ring-accent"
+      title="Share quote to X / Twitter"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+      </svg>
+      <span>Share</span>
+    </button>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    const toolbar = document.getElementById('selection-toolbar');
+    const quoteBtn = document.getElementById('btn-quote-copy');
+    const shareBtn = document.getElementById('btn-share-x');
+    if (!toolbar) return;
+
+    let selectedText = '';
+
+    const updateToolbarPosition = () => {
+      const selection = window.getSelection();
+      if (!selection || selection.isCollapsed) {
+        toolbar.classList.add('hidden');
+        return;
+      }
+
+      const text = selection.toString().trim();
+      if (text.length < 3) {
+        toolbar.classList.add('hidden');
+        return;
+      }
+
+      // Check if selection is within article content (.prose)
+      const range = selection.getRangeAt(0);
+      const prose = document.querySelector('.prose');
+      if (!prose || !prose.contains(range.commonAncestorContainer)) {
+        toolbar.classList.add('hidden');
+        return;
+      }
+
+      selectedText = text;
+      const rect = range.getBoundingClientRect();
+
+      toolbar.style.left = `${rect.left + rect.width / 2}px`;
+      toolbar.style.top = `${rect.top - 8}px`;
+      toolbar.classList.remove('hidden');
+    };
+
+    document.addEventListener('selectionchange', () => {
+      // Small debounce
+      setTimeout(updateToolbarPosition, 10);
+    });
+
+    document.addEventListener('mousedown', (e) => {
+      if (toolbar.contains(e.target)) return;
+      setTimeout(() => {
+        const selection = window.getSelection();
+        if (!selection || selection.isCollapsed) {
+          toolbar.classList.add('hidden');
+        }
+      }, 100);
+    });
+
+    quoteBtn?.addEventListener('click', async (e) => {
+      e.preventDefault();
+      if (!selectedText) return;
+      const formattedQuote = `"> ${selectedText.replace(/\n/g, '\n> ')}"\n\n— ${document.title} (${window.location.href})`;
+      try {
+        await navigator.clipboard.writeText(formattedQuote);
+        const span = quoteBtn.querySelector('span');
+        if (span) {
+          const orig = span.textContent;
+          span.textContent = 'Copied!';
+          setTimeout(() => { span.textContent = orig; }, 1500);
+        }
+      } catch (err) {
+        console.error('Failed to copy quote', err);
+      }
+    });
+
+    shareBtn?.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (!selectedText) return;
+      const tweetText = `"${selectedText.slice(0, 220)}${selectedText.length > 220 ? '...' : ''}" via @kunalsuri`;
+      const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}&url=${encodeURIComponent(window.location.href)}`;
+      window.open(tweetUrl, '_blank', 'noopener,noreferrer');
+    });
+  })();
+</script>

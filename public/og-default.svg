@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0a0a0b"/>
+      <stop offset="50%" stop-color="#151513"/>
+      <stop offset="100%" stop-color="#1c1a15"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#d8b45f"/>
+      <stop offset="100%" stop-color="#e7c67a"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background Card -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect x="40" y="40" width="1120" height="550" rx="24" fill="#151513" fill-opacity="0.7" stroke="#24231f" stroke-width="2"/>
+  
+  <!-- Vertical Accent Pillar -->
+  <rect x="80" y="80" width="8" height="470" rx="4" fill="url(#accent)"/>
+
+  <!-- Category Eyebrow Pill -->
+  <rect x="120" y="95" width="160" height="36" rx="18" fill="#d8b45f" fill-opacity="0.15"/>
+  <text x="200" y="118" font-family="system-ui, -apple-system, sans-serif" font-size="13" font-weight="700" fill="#d8b45f" text-anchor="middle" letter-spacing="2">ESSAYS &amp; IDEAS</text>
+
+  <!-- Main Headline Title -->
+  <foreignObject x="120" y="160" width="960" height="220">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="color: #ece7db; font-family: 'Bricolage Grotesque', system-ui, -apple-system, sans-serif; font-size: 54px; font-weight: 800; line-height: 1.15; letter-spacing: -0.02em;">
+      Kunal Suri · Software, Systems &amp; Engineering
+    </div>
+  </foreignObject>
+
+  <!-- Tagline / Description -->
+  <foreignObject x="120" y="380" width="960" height="100">
+    <div xmlns="http://www.w3.org/1999/xhtml" style="color: #918b7e; font-family: Georgia, serif; font-size: 24px; line-height: 1.5; font-style: italic;">
+      I write about building software — the decisions behind the code, and the ideas worth keeping.
+    </div>
+  </foreignObject>
+
+  <!-- Footer Divider Line -->
+  <line x1="120" y1="495" x2="1080" y2="495" stroke="#24231f" stroke-width="1.5"/>
+  <text x="120" y="535" font-family="system-ui, -apple-system, sans-serif" font-size="20" font-weight="700" fill="#ece7db">kunalsuri.github.io</text>
+  <text x="1080" y="535" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#d8b45f" text-anchor="end">Kunal Suri</text>
+</svg>

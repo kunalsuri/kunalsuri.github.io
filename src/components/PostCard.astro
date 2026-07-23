@@ -1,0 +1,39 @@
+---
+import FormattedDate from './FormattedDate.astro';
+
+interface Props {
+  url: string;
+  title: string;
+  description: string;
+  pubDate: Date;
+  category?: string;
+  tags?: string[];
+  readingTime?: string;
+}
+
+const { url, title, description, pubDate, category, readingTime } = Astro.props;
+---
+
+<article class="row-link border-b border-line py-6 last:border-0">
+  <a href={url} class="block">
+    <div class="eyebrow flex flex-wrap items-center gap-x-3 gap-y-1">
+      <FormattedDate date={pubDate} />
+      {category && (
+        <>
+          <span aria-hidden="true">&middot;</span>
+          <span>{category}</span>
+        </>
+      )}
+      {readingTime && (
+        <>
+          <span aria-hidden="true">&middot;</span>
+          <span>{readingTime}</span>
+        </>
+      )}
+    </div>
+    <h3 class="row-title mt-2 font-display text-xl font-bold tracking-tight sm:text-2xl">
+      {title}
+    </h3>
+    <p class="mt-1.5 font-body text-muted">{description}</p>
+  </a>
+</article>

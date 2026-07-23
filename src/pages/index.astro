@@ -1,0 +1,54 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import { getPublishedPosts } from '../utils/posts';
+import { SITE_TAGLINE } from '../consts';
+import { readingTime } from '../utils/reading-time';
+
+const posts = (await getPublishedPosts()).slice(0, 5);
+---
+
+<BaseLayout spotlight>
+  <section class="pt-10 pb-14 sm:pt-16 sm:pb-20">
+    <p class="eyebrow reveal reveal-1">Kunal Suri &middot; Tech, Leadership &amp; Philosophy </p>
+    {/* The hero is your thesis — rewrite this line in your own voice. */}
+    <h1 class="display hero-title reveal reveal-2 mt-5">Ideas<br />that Scale.</h1>
+    <p class="reveal reveal-3 mt-6 max-w-lg font-body text-lg text-muted sm:text-xl">
+      {SITE_TAGLINE}
+    </p>
+    <div class="reveal reveal-4 mt-8 flex items-center gap-5">
+      <a
+        href="/blog"
+        class="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 font-display text-sm font-semibold text-paper transition-transform hover:-translate-y-0.5"
+      >
+        Read the writing
+        <span aria-hidden="true">&rarr;</span>
+      </a>
+      <a href="/about" class="font-display text-sm font-medium text-muted transition-colors hover:text-accent">
+        About
+      </a>
+    </div>
+  </section>
+
+  <section>
+    <div class="flex items-baseline justify-between">
+      <h2 class="eyebrow">Recent</h2>
+      <a href="/blog" class="font-mono text-xs text-accent hover:underline">All &rarr;</a>
+    </div>
+    <div class="mt-2">
+      {
+        posts.map((post) => (
+          <PostCard
+            url={`/blog/${post.id}/`}
+            title={post.data.title}
+            description={post.data.description}
+            pubDate={post.data.pubDate}
+            category={post.data.category}
+            tags={post.data.tags}
+            readingTime={readingTime(post.body ?? '')}
+          />
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

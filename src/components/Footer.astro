@@ -1,0 +1,25 @@
+---
+import { SOCIAL, AUTHOR } from '../consts';
+
+const year = new Date().getFullYear();
+---
+
+<footer data-pagefind-ignore class="mt-24 border-t border-line pt-8 pb-12 text-sm">
+  <div class="flex flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+    <div class="max-w-xs">
+      <p class="font-display font-bold">{AUTHOR}</p>
+      <p class="mt-1 text-muted">Opinions &amp; ideas, published in the open.</p>
+    </div>
+    <nav class="grid grid-cols-2 sm:grid-cols-4 gap-x-8 gap-y-2 font-mono text-xs uppercase tracking-wider text-muted">
+      <a href="/blog" class="transition-colors hover:text-accent">Writing</a>
+      <a href="/tags" class="transition-colors hover:text-accent">Tags</a>
+      <a href="/archive" class="transition-colors hover:text-accent">Archive</a>
+      <a href="/search" class="transition-colors hover:text-accent">Search</a>
+      <a href={SOCIAL.github} target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-accent">GitHub</a>
+      <a href={SOCIAL.linkedin} target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-accent">LinkedIn</a>
+      <a href={SOCIAL.substack} target="_blank" rel="noopener noreferrer" class="transition-colors hover:text-accent">Substack</a>
+      <a href="/rss.xml" class="transition-colors hover:text-accent">RSS</a>
+    </nav>
+  </div>
+  <p class="eyebrow mt-10">&copy; {year} — and, one more thing.</p>
+</footer>

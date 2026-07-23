@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SOCIAL } from '../consts';
+---
+
+<BaseLayout title="About" description="About Kunal Suri.">
+  <section class="py-8">
+    <p class="eyebrow">About</p>
+    <h1 class="display mt-4 text-4xl sm:text-5xl">Hi, I'm Kunal.</h1>
+    <div class="prose mt-8">
+      {/* (kunal): this one's genuinely yours — who you are, what you build, why you write. */}
+      <p>
+        I build software using AI-Powered tools and write here about the decisions behind it — the
+        trade-offs, the dead ends, and the ideas that turned out worth keeping.
+      </p>
+      <p>
+        I also write about things that interest me — my life, my experiences, and anything else that
+        tickles my fancy.
+      </p>
+      <p>
+        Find me on <a href={SOCIAL.github} target="_blank" rel="noopener noreferrer">GitHub</a>, <a
+          href={SOCIAL.linkedin}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          LinkedIn
+        </a>,
+        and <a href={SOCIAL.substack} target="_blank" rel="noopener noreferrer">Substack</a>, or subscribe
+        via <a href="/rss.xml">RSS</a> to follow along.
+      </p>
+    </div>
+  </section>
+</BaseLayout>

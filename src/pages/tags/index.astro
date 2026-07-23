@@ -1,0 +1,31 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getTags } from '../../utils/taxonomy';
+
+const tags = await getTags();
+---
+
+<BaseLayout title="Tags" description="Browse posts by tag.">
+  <section class="py-8">
+    <p class="eyebrow">Topics</p>
+    <h1 class="display mt-4 text-4xl sm:text-5xl">Tags</h1>
+
+    {
+      tags.length === 0 ? (
+        <p class="mt-8 font-body text-muted">No tags yet.</p>
+      ) : (
+        <div class="mt-8 flex flex-wrap gap-3">
+          {tags.map((t) => (
+            <a
+              href={`/tags/${t.slug}`}
+              class="row-link inline-flex items-baseline gap-2 rounded-full border border-line px-4 py-2 transition-colors hover:border-accent"
+            >
+              <span class="row-title font-display font-semibold">#{t.name}</span>
+              <span class="font-mono text-xs text-muted">{t.count}</span>
+            </a>
+          ))}
+        </div>
+      )
+    }
+  </section>
+</BaseLayout>

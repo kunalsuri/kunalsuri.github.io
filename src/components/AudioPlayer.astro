@@ -1,0 +1,174 @@
+---
+// AudioPlayer.astro — Text-to-Speech (TTS) article listening widget via Web Speech API
+---
+
+<div
+  id="audio-player"
+  class="my-4 hidden rounded-xl border border-line bg-surface/50 p-3 text-sm transition-all duration-200"
+  aria-label="Audio Reader"
+  data-pagefind-ignore
+>
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <div class="flex items-center gap-3">
+      <button
+        id="tts-play-btn"
+        class="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-paper transition-transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent"
+        aria-label="Listen to post"
+      >
+        <svg id="tts-play-icon" class="h-4 w-4 fill-current ml-0.5" viewBox="0 0 24 24">
+          <path d="M8 5v14l11-7z"></path>
+        </svg>
+        <svg id="tts-pause-icon" class="hidden h-4 w-4 fill-current" viewBox="0 0 24 24">
+          <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"></path>
+        </svg>
+      </button>
+
+      <div>
+        <span class="font-display font-medium text-ink block text-xs sm:text-sm">Listen to post</span>
+        <span id="tts-status" class="font-mono text-[11px] text-muted">Web Speech AI Reader</span>
+      </div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <div class="flex items-center rounded-md border border-line bg-paper px-1.5 py-0.5 font-mono text-xs text-muted">
+        <button id="tts-speed-btn" class="px-1 py-0.5 transition-colors hover:text-accent font-semibold" title="Playback Speed">
+          1.0x
+        </button>
+      </div>
+      <button
+        id="tts-stop-btn"
+        class="hidden rounded-md border border-line px-2 py-1 font-mono text-xs text-muted transition-colors hover:border-accent hover:text-accent"
+        title="Stop Speech"
+      >
+        Stop
+      </button>
+    </div>
+  </div>
+
+  <div id="tts-progress-bar" class="mt-2.5 hidden h-1.5 w-full overflow-hidden rounded-full bg-line">
+    <div id="tts-progress-fill" class="h-full bg-accent transition-all duration-300" style="width: 0%;"></div>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    const player = document.getElementById('audio-player');
+    const playBtn = document.getElementById('tts-play-btn');
+    const playIcon = document.getElementById('tts-play-icon');
+    const pauseIcon = document.getElementById('tts-pause-icon');
+    const stopBtn = document.getElementById('tts-stop-btn');
+    const speedBtn = document.getElementById('tts-speed-btn');
+    const statusText = document.getElementById('tts-status');
+    const progressBar = document.getElementById('tts-progress-bar');
+    const progressFill = document.getElementById('tts-progress-fill');
+
+    if (!('speechSynthesis' in window) || !player) {
+      return;
+    }
+
+    // Speech API supported — unhide player widget
+    player.classList.remove('hidden');
+
+    let synth = window.speechSynthesis;
+    let utterance = null;
+    let isSpeaking = false;
+    let currentRateIndex = 0;
+    const rates = [1.0, 1.25, 1.5, 2.0];
+
+    const getArticleText = () => {
+      const prose = document.querySelector('.prose');
+      if (!prose) return '';
+      // Clone prose to clean up non-readable code blocks or ignored elements
+      const clone = prose.cloneNode(true);
+      clone.querySelectorAll('pre, [data-pagefind-ignore]').forEach((el) => el.remove());
+      return clone.textContent.replace(/\s+/g, ' ').trim();
+    };
+
+    const startSpeech = () => {
+      const text = getArticleText();
+      if (!text) return;
+
+      synth.cancel(); // Stop any ongoing speech
+
+      utterance = new SpeechSynthesisUtterance(text);
+      utterance.rate = rates[currentRateIndex];
+
+      utterance.onstart = () => {
+        isSpeaking = true;
+        playIcon?.classList.add('hidden');
+        pauseIcon?.classList.remove('hidden');
+        stopBtn?.classList.remove('hidden');
+        progressBar?.classList.remove('hidden');
+        if (statusText) statusText.textContent = `Playing (${rates[currentRateIndex]}x)...`;
+      };
+
+      utterance.onend = () => {
+        resetState();
+        if (statusText) statusText.textContent = 'Completed';
+      };
+
+      utterance.onerror = (e) => {
+        console.error('Speech synthesis error:', e);
+        resetState();
+        if (statusText) statusText.textContent = 'Speech error';
+      };
+
+      utterance.onboundary = (e) => {
+        if (e.name === 'word' && text.length > 0) {
+          const progress = Math.min(100, Math.round((e.charIndex / text.length) * 100));
+          if (progressFill) progressFill.style.width = `${progress}%`;
+        }
+      };
+
+      synth.speak(utterance);
+    };
+
+    const resetState = () => {
+      isSpeaking = false;
+      playIcon?.classList.remove('hidden');
+      pauseIcon?.classList.add('hidden');
+      stopBtn?.classList.add('hidden');
+      progressBar?.classList.add('hidden');
+      if (progressFill) progressFill.style.width = '0%';
+      if (statusText) statusText.textContent = 'Web Speech AI Reader';
+    };
+
+    playBtn?.addEventListener('click', () => {
+      if (!isSpeaking) {
+        startSpeech();
+      } else if (synth.speaking && !synth.paused) {
+        synth.pause();
+        playIcon?.classList.remove('hidden');
+        pauseIcon?.classList.add('hidden');
+        if (statusText) statusText.textContent = 'Paused';
+      } else if (synth.paused) {
+        synth.resume();
+        playIcon?.classList.add('hidden');
+        pauseIcon?.classList.remove('hidden');
+        if (statusText) statusText.textContent = `Playing (${rates[currentRateIndex]}x)...`;
+      }
+    });
+
+    stopBtn?.addEventListener('click', () => {
+      synth.cancel();
+      resetState();
+    });
+
+    speedBtn?.addEventListener('click', () => {
+      currentRateIndex = (currentRateIndex + 1) % rates.length;
+      const newRate = rates[currentRateIndex];
+      if (speedBtn) speedBtn.textContent = `${newRate.toFixed(1)}x`;
+
+      if (isSpeaking) {
+        // Restart speech with new rate from current position if active
+        synth.cancel();
+        startSpeech();
+      }
+    });
+
+    // Cleanup on page unload/navigation
+    window.addEventListener('beforeunload', () => {
+      if (synth) synth.cancel();
+    });
+  })();
+</script>

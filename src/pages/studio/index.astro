@@ -1,0 +1,29 @@
+---
+import '../../styles/global.css';
+import '../../styles/studio.css';
+import { StudioApp } from '../../components/studio/StudioApp.tsx';
+
+// Dev-only guard: return 404 if built for production
+if (!import.meta.env.DEV) {
+  return new Response(
+    '<!DOCTYPE html><html lang="en" data-pagefind-ignore><head><title>Not Found</title></head><body>404 Not Found</body></html>',
+    { status: 404, headers: { 'Content-Type': 'text/html' } }
+  );
+}
+---
+
+<!DOCTYPE html>
+<html
+  lang="en"
+  class="h-full bg-[var(--studio-bg)] text-[var(--studio-text-primary)] antialiased selection:bg-[var(--studio-accent)] selection:text-[var(--studio-bg)]"
+>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Atelier — Essay & Blog Writing Studio</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  </head>
+  <body class="h-full overflow-hidden m-0 p-0" data-pagefind-ignore>
+    <StudioApp client:only="preact" />
+  </body>
+</html>

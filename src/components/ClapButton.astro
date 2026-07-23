@@ -1,0 +1,93 @@
+---
+// ClapButton.astro — Interactive Applause & Feedback Button (Medium / Substack Vibe)
+interface Props {
+  postId?: string;
+}
+
+const { postId = 'global' } = Astro.props;
+---
+
+<div
+  class="my-10 flex flex-col items-center justify-center rounded-2xl border border-line bg-surface/30 p-6 text-center"
+  data-pagefind-ignore
+>
+  <p class="eyebrow mb-2">Was this valuable?</p>
+  <p class="font-display text-sm text-muted mb-4">Give it a clap to let the author know!</p>
+
+  <div class="relative inline-flex items-center">
+    <button
+      id="clap-btn"
+      data-post-id={postId}
+      class="group relative flex h-14 w-14 items-center justify-center rounded-full border border-line bg-paper shadow-sm transition-all duration-200 hover:scale-110 hover:border-accent hover:shadow-md active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent"
+      aria-label="Clap for this post"
+    >
+      <span id="clap-icon" class="text-2xl transition-transform group-hover:scale-110 select-none">👏</span>
+      
+      <!-- Floating +1 popups container -->
+      <div id="clap-popups" class="pointer-events-none absolute inset-0 flex items-center justify-center"></div>
+    </button>
+
+    <div class="ml-4 flex flex-col items-start">
+      <span id="clap-count" class="font-mono text-lg font-bold text-ink">0</span>
+      <span class="font-mono text-[11px] text-muted">claps</span>
+    </div>
+  </div>
+</div>
+
+<script is:inline>
+  (function () {
+    const clapBtn = document.getElementById('clap-btn');
+    const clapCountEl = document.getElementById('clap-count');
+    const popupsContainer = document.getElementById('clap-popups');
+
+    if (!clapBtn || !clapCountEl) return;
+
+    const postId = clapBtn.getAttribute('data-post-id') || window.location.pathname;
+    const storageKey = `claps_${postId}`;
+    const maxClapsPerUser = 50;
+
+    // Load initial clap count from localStorage
+    let userClaps = parseInt(localStorage.getItem(storageKey) || '0', 10);
+    // Base count (simulated static engagement threshold + user claps)
+    let totalClaps = 12 + userClaps;
+
+    clapCountEl.textContent = totalClaps.toString();
+
+    clapBtn.addEventListener('click', () => {
+      if (userClaps >= maxClapsPerUser) {
+        // Show max reached feedback
+        showPopup('Max!');
+        return;
+      }
+
+      userClaps++;
+      totalClaps++;
+      localStorage.setItem(storageKey, userClaps.toString());
+      clapCountEl.textContent = totalClaps.toString();
+
+      // Trigger floating +1 animation
+      showPopup('+1');
+
+      // Visual pulse
+      clapBtn.classList.add('scale-125', 'border-accent');
+      setTimeout(() => {
+        clapBtn.classList.remove('scale-125', 'border-accent');
+      }, 150);
+    });
+
+    function showPopup(text) {
+      if (!popupsContainer) return;
+      const popup = document.createElement('span');
+      popup.className = 'absolute font-mono text-xs font-bold text-accent animate-float-clap pointer-events-none select-none';
+      popup.textContent = text;
+      // Slight random horizontal offset
+      const randomX = (Math.random() - 0.5) * 20;
+      popup.style.transform = `translateX(${randomX}px)`;
+
+      popupsContainer.appendChild(popup);
+      setTimeout(() => {
+        popup.remove();
+      }, 750);
+    }
+  })();
+</script>

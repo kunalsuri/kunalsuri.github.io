@@ -1,0 +1,10 @@
+# Normalize line endings to LF in the repo (silences the CRLF warnings on Windows)
+* text=auto eol=lf
+
+# Binary assets git shouldn't touch
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.woff binary
+*.woff2 binary

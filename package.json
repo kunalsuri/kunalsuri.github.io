@@ -1,0 +1,41 @@
+{
+  "name": "kunalsuri-blog",
+  "type": "module",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "postbuild": "pagefind --site dist",
+    "preview": "astro preview",
+    "check": "astro check",
+    "astro": "astro",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:unit": "vitest run tests/unit",
+    "test:integration": "vitest run tests/integration"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^7.0.2",
+    "@astrojs/preact": "^6.0.1",
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.3",
+    "astro": "^7.0.6",
+    "js-yaml": "^4.3.0",
+    "preact": "^10.29.6",
+    "rehype-stringify": "^10.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
+    "unified": "^11.0.5",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.9",
+    "@tailwindcss/vite": "^4.3.2",
+    "pagefind": "^1.5.2",
+    "tailwindcss": "^4.3.2",
+    "typescript": "^6.0.3",
+    "vitest": "^3.2.3"
+  }
+}

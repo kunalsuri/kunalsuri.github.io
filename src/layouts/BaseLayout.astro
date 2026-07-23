@@ -1,0 +1,40 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  /** Renders the keynote spotlight behind the page's focal point. */
+  spotlight?: boolean;
+  /** Custom outer container width class (e.g. max-w-5xl for blog posts). */
+  containerClass?: string;
+  article?: {
+    title: string;
+    description: string;
+    pubDate: Date;
+    updatedDate?: Date;
+    category?: string;
+    tags?: string[];
+  };
+}
+
+const { title, description, spotlight = false, containerClass = 'max-w-2xl', article } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={title} description={description} article={article} />
+  </head>
+  <body>
+    <div class:list={['mx-auto flex min-h-screen flex-col px-5 sm:px-6', containerClass]}>
+      <Header />
+      <main class:list={['flex-1', spotlight && 'spotlight']}>
+        <slot />
+      </main>
+      <Footer />
+    </div>
+  </body>
+</html>

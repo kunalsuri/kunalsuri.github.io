@@ -1,0 +1,138 @@
+---
+import { SITE_TITLE, SITE_DESCRIPTION, AUTHOR, ANALYTICS } from '../consts';
+// Importing global.css here means every page that renders <BaseHead> gets the
+// stylesheet (and Tailwind) bundled in — one import, site-wide.
+import '../styles/global.css';
+
+interface ArticleMeta {
+  title: string;
+  description: string;
+  pubDate: Date;
+  updatedDate?: Date;
+  category?: string;
+  tags?: string[];
+}
+
+interface Props {
+  title?: string;
+  description?: string;
+  article?: ArticleMeta;
+}
+
+const { title, description = SITE_DESCRIPTION, article } = Astro.props;
+const pageTitle = title ? `${title} · ${SITE_TITLE}` : `${SITE_TITLE} · Opinions & ideas`;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+
+// Compute Open Graph preview image URL
+const ogImageURL = new URL('/og-default.svg', Astro.site);
+
+const jsonLd = article
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'BlogPosting',
+      headline: article.title,
+      description: article.description,
+      datePublished: article.pubDate.toISOString(),
+      ...(article.updatedDate ? { dateModified: article.updatedDate.toISOString() } : {}),
+      author: {
+        '@type': 'Person',
+        name: AUTHOR,
+        url: new URL('about', Astro.site).toString(),
+      },
+      publisher: {
+        '@type': 'Person',
+        name: AUTHOR,
+      },
+      mainEntityOfPage: {
+        '@type': 'WebPage',
+        '@id': canonicalURL.toString(),
+      },
+    }
+  : {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: SITE_TITLE,
+      description: SITE_DESCRIPTION,
+      url: Astro.site?.toString(),
+      author: {
+        '@type': 'Person',
+        name: AUTHOR,
+        url: new URL('about', Astro.site).toString(),
+      },
+    };
+---
+
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+<link rel="sitemap" href="/sitemap-index.xml" />
+<link
+  rel="alternate"
+  type="application/rss+xml"
+  title={SITE_TITLE}
+  href={new URL('rss.xml', Astro.site)}
+/>
+<link rel="canonical" href={canonicalURL} />
+<meta name="generator" content={Astro.generator} />
+
+<!-- Type system: Bricolage Grotesque (display) + Newsreader (reading). -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..48,400;12..48,600;12..48,700;12..48,800&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&display=swap"
+/>
+
+<title>{pageTitle}</title>
+<meta name="description" content={description} />
+
+<!-- Open Graph / social cards -->
+<meta property="og:type" content={article ? 'article' : 'website'} />
+<meta property="og:title" content={pageTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonicalURL} />
+<meta property="og:image" content={ogImageURL} />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={pageTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImageURL} />
+
+{/* Privacy Analytics (Cloudflare Web Analytics or GoatCounter if configured) */}
+{
+  ANALYTICS.cloudflareToken && (
+    <script
+      defer
+      src="https://static.cloudflareinsights.com/beacon.min.js"
+      data-cf-beacon={`{"token": "${ANALYTICS.cloudflareToken}"}`}
+    ></script>
+  )
+}
+{
+  ANALYTICS.goatcounterCode && (
+    <script
+      data-goatcounter={`https://${ANALYTICS.goatcounterCode}.goatcounter.com/count`}
+      async
+      src="//gc.zgo.at/count.js"
+    ></script>
+  )
+}
+
+<!-- Structured Data (JSON-LD) for Search Engines & LLM Entities -->
+<script is:inline type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+<!--
+  Set the theme BEFORE first paint to avoid a flash of the wrong theme.
+  `is:inline` keeps Astro from deferring it. Reads a saved choice, else OS.
+-->
+<script is:inline>
+  const theme = (() => {
+    try {
+      const stored = localStorage.getItem('theme');
+      if (stored === 'light' || stored === 'dark') return stored;
+    } catch (_) {}
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
+  })();
+  document.documentElement.classList.toggle('dark', theme === 'dark');
+</script>

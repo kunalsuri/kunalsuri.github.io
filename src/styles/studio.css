@@ -1,0 +1,180 @@
+/* Studio Design System & Theme CSS
+   Token *values* are drawn from global.css's paper/ink/brass identity
+   (see the "Keynote" system) so Atelier feels like the same hand as the
+   site it publishes to, not a generic dashboard bolted on next to it.
+   Variable *names* are a stable contract consumed throughout src/components/studio —
+   do not rename without updating every `var(--studio-*)` call site. */
+
+:root, .theme-dark {
+  --studio-bg: #0a0a0b;
+  --studio-bg-secondary: #121210;
+  --studio-bg-card: rgba(21, 21, 19, 0.82);
+  --studio-border: rgba(36, 35, 31, 0.9);
+  --studio-border-hover: rgba(216, 180, 95, 0.45);
+  --studio-text-primary: #ece7db;
+  --studio-text-secondary: #b8b2a2;
+  --studio-text-muted: #918b7e;
+  --studio-accent: #d8b45f;
+  --studio-accent-glow: rgba(216, 180, 95, 0.14);
+  --studio-accent-hover: #e7c67a;
+  --studio-badge-draft-bg: rgba(245, 158, 11, 0.16);
+  --studio-badge-draft-text: #f3c988;
+  --studio-badge-draft-border: rgba(245, 158, 11, 0.32);
+  --studio-badge-pub-bg: rgba(110, 168, 110, 0.16);
+  --studio-badge-pub-text: #9fcf9a;
+  --studio-badge-pub-border: rgba(110, 168, 110, 0.32);
+}
+
+.theme-light {
+  --studio-bg: #faf9f6;
+  --studio-bg-secondary: #ffffff;
+  --studio-bg-card: rgba(255, 255, 255, 0.88);
+  --studio-border: #e6e3da;
+  --studio-border-hover: #c9b98a;
+  --studio-text-primary: #17150f;
+  --studio-text-secondary: #6c675d;
+  --studio-text-muted: #9c9686;
+  --studio-accent: #8a6a26;
+  --studio-accent-glow: rgba(138, 106, 38, 0.1);
+  --studio-accent-hover: #6f551d;
+  --studio-badge-draft-bg: #fbead0;
+  --studio-badge-draft-text: #8a5a12;
+  --studio-badge-draft-border: #eed3a6;
+  --studio-badge-pub-bg: #e3ecdc;
+  --studio-badge-pub-text: #3f6b3a;
+  --studio-badge-pub-border: #c7dbba;
+}
+
+/* True-black, low-glare variant for late-night writing sessions — same
+   brass family as the other themes, dimmed to a muted bronze so it reads
+   quiet on an OLED panel instead of glowing. */
+.theme-midnight {
+  --studio-bg: #000000;
+  --studio-bg-secondary: #0a0a0a;
+  --studio-bg-card: rgba(10, 10, 10, 0.85);
+  --studio-border: rgba(255, 255, 255, 0.08);
+  --studio-border-hover: rgba(184, 137, 90, 0.4);
+  --studio-text-primary: #e4e2dc;
+  --studio-text-secondary: #a29c8f;
+  --studio-text-muted: #625d53;
+  --studio-accent: #b8895a;
+  --studio-accent-glow: rgba(184, 137, 90, 0.12);
+  --studio-accent-hover: #cf9d6c;
+  --studio-badge-draft-bg: rgba(196, 138, 62, 0.18);
+  --studio-badge-draft-text: #e0af74;
+  --studio-badge-draft-border: rgba(196, 138, 62, 0.32);
+  --studio-badge-pub-bg: rgba(90, 130, 100, 0.18);
+  --studio-badge-pub-text: #8fb99a;
+  --studio-badge-pub-border: rgba(90, 130, 100, 0.32);
+}
+
+/* Warm parchment/manuscript variant — creamier and more saturated than
+   Studio Light's crisp paper, with a deeper sepia-ink accent. */
+.theme-paper {
+  --studio-bg: #f6f1e4;
+  --studio-bg-secondary: #efe7d3;
+  --studio-bg-card: rgba(239, 231, 211, 0.9);
+  --studio-border: #e0d3b2;
+  --studio-border-hover: #b0894a;
+  --studio-text-primary: #2b2620;
+  --studio-text-secondary: #6b6152;
+  --studio-text-muted: #a3987f;
+  --studio-accent: #9c6b2e;
+  --studio-accent-glow: rgba(156, 107, 46, 0.12);
+  --studio-accent-hover: #7d5522;
+  --studio-badge-draft-bg: #f3ddb0;
+  --studio-badge-draft-text: #7a4e12;
+  --studio-badge-draft-border: #e4c586;
+  --studio-badge-pub-bg: #dde8ce;
+  --studio-badge-pub-text: #3f6633;
+  --studio-badge-pub-border: #c3d8ac;
+}
+
+/* Custom Scrollbar */
+.studio-custom-scroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.studio-custom-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.studio-custom-scroll::-webkit-scrollbar-thumb {
+  background: var(--studio-border);
+  border-radius: 9999px;
+}
+.studio-custom-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--studio-accent);
+}
+
+/* ::backdrop pseudo-elements do NOT inherit CSS custom properties from the
+   <dialog> (or any ancestor) — per spec they only inherit each inheritable
+   property's initial value, never a cascaded var(). A `background:
+   var(--studio-bg)` rule here would silently resolve to nothing. So the
+   Modal/Drawer backdrop is themed with real descendant selectors and literal
+   colors approximating each theme's --studio-bg, not var() lookups. */
+dialog.studio-dialog::backdrop {
+  background: rgba(10, 10, 11, 0.78);
+}
+.theme-light dialog.studio-dialog::backdrop {
+  background: rgba(250, 249, 246, 0.75);
+}
+.theme-midnight dialog.studio-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.82);
+}
+.theme-paper dialog.studio-dialog::backdrop {
+  background: rgba(246, 241, 228, 0.78);
+}
+
+/* Reset the browser's default <dialog> chrome (border/padding/position);
+   Modal.tsx owns layout via normal flex/className props instead. */
+dialog.studio-dialog {
+  border: none;
+  padding: 0;
+  margin: 0;
+  max-width: none;
+  max-height: none;
+  background: transparent;
+  color: inherit;
+}
+
+/* Keyframes */
+@keyframes studioFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes studioSlideRight {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes studioSlideLeft {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-studio-fade {
+  animation: studioFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-studio-slide-right {
+  animation: studioSlideRight 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.animate-studio-slide-left {
+  animation: studioSlideLeft 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

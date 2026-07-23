@@ -1,0 +1,69 @@
+---
+import { getCollection, render } from 'astro:content';
+import BlogPost from '../../layouts/BlogPost.astro';
+import { readingTime } from '../../utils/reading-time';
+
+// Astro is a static site generator: getStaticPaths() runs at BUILD time and
+// tells Astro every URL to pre-render. One HTML file per post, zero server.
+export async function getStaticPaths() {
+  const posts = await getCollection('blog', ({ data }) =>
+    import.meta.env.PROD ? data.draft !== true : true,
+  );
+
+  posts.sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf());
+
+  return posts.map((post, index) => {
+    const prevPost = posts[index + 1]
+      ? { id: posts[index + 1].id, title: posts[index + 1].data.title }
+      : undefined;
+    const nextPost = posts[index - 1]
+      ? { id: posts[index - 1].id, title: posts[index - 1].data.title }
+      : undefined;
+
+    const currentCategory = post.data.category;
+    const currentTags = post.data.tags || [];
+
+    const relatedPosts = posts
+      .filter((p) => p.id !== post.id)
+      .map((p) => {
+        let score = 0;
+        if (p.data.category && p.data.category === currentCategory) score += 3;
+        if (p.data.tags) {
+          const common = p.data.tags.filter((t) => currentTags.includes(t));
+          score += common.length * 2;
+        }
+        return { post: p, score };
+      })
+      .filter((item) => item.score > 0)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 2)
+      .map((item) => ({
+        id: item.post.id,
+        title: item.post.data.title,
+        description: item.post.data.description,
+        pubDate: item.post.data.pubDate,
+        category: item.post.data.category,
+      }));
+
+    return {
+      params: { slug: post.id },
+      props: { post, prevPost, nextPost, relatedPosts },
+    };
+  });
+}
+
+const { post, prevPost, nextPost, relatedPosts } = Astro.props;
+const { Content, headings } = await render(post);
+---
+
+<BlogPost
+  {...post.data}
+  readingTime={readingTime(post.body ?? '')}
+  headings={headings}
+  prevPost={prevPost}
+  nextPost={nextPost}
+  relatedPosts={relatedPosts}
+>
+  <Content />
+</BlogPost>
+

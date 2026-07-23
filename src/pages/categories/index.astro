@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCategories } from '../../utils/taxonomy';
+
+const categories = await getCategories();
+---
+
+<BaseLayout title="Categories" description="Browse posts by section.">
+  <section class="py-8">
+    <p class="eyebrow">Sections</p>
+    <h1 class="display mt-4 text-4xl sm:text-5xl">Categories</h1>
+
+    {
+      categories.length === 0 ? (
+        <p class="mt-8 font-body text-muted">No categories yet.</p>
+      ) : (
+        <div class="mt-8 border-t border-line">
+          {categories.map((c) => (
+            <a
+              href={`/categories/${c.slug}`}
+              class="row-link flex items-baseline justify-between gap-4 border-b border-line py-4"
+            >
+              <span class="row-title font-display text-xl font-bold">{c.name}</span>
+              <span class="font-mono text-xs text-muted">
+                {c.count} post{c.count === 1 ? '' : 's'}
+              </span>
+            </a>
+          ))}
+        </div>
+      )
+    }
+  </section>
+</BaseLayout>

@@ -1,0 +1,568 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Comments from '../components/Comments.astro';
+import AudioPlayer from '../components/AudioPlayer.astro';
+import SelectionToolbar from '../components/SelectionToolbar.astro';
+import ClapButton from '../components/ClapButton.astro';
+import NewsletterCTA from '../components/NewsletterCTA.astro';
+import { slugify } from '../utils/taxonomy';
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface AdjacentPost {
+  id: string;
+  title: string;
+}
+
+interface RelatedPost {
+  id: string;
+  title: string;
+  description: string;
+  pubDate: Date;
+  category?: string;
+}
+
+interface Props {
+  title: string;
+  description: string;
+  pubDate: Date;
+  updatedDate?: Date;
+  category?: string;
+  tags?: string[];
+  readingTime?: string;
+  headings?: Heading[];
+  prevPost?: AdjacentPost;
+  nextPost?: AdjacentPost;
+  relatedPosts?: RelatedPost[];
+}
+
+const {
+  title,
+  description,
+  pubDate,
+  updatedDate,
+  category = 'Notes',
+  tags = [],
+  readingTime,
+  headings = [],
+  prevPost,
+  nextPost,
+  relatedPosts = [],
+} = Astro.props;
+
+const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
+---
+
+<BaseLayout
+  title={title}
+  description={description}
+  containerClass="max-w-5xl"
+  article={{ title, description, pubDate, updatedDate, category, tags }}
+>
+  <!-- Reading Progress Bar -->
+  <div
+    id="reading-progress"
+    class="fixed top-0 left-0 h-[3px] bg-accent z-50 transition-all duration-100 ease-out"
+    style="width: 0%;"
+  ></div>
+
+  <!-- Sticky Top Reading Context Bar (Medium style) -->
+  <div id="sticky-nav-bar" class="py-2.5 px-6 shadow-sm" data-pagefind-ignore aria-label="Reading Progress Header">
+    <div class="mx-auto flex max-w-5xl items-center justify-between font-mono text-xs">
+      <div class="flex items-center gap-2 truncate pr-4">
+        <a href="/blog" class="font-bold text-accent hover:text-ink transition-colors shrink-0">Kunal Suri</a>
+        <span class="text-muted" aria-hidden="true">&middot;</span>
+        <span id="sticky-title" class="truncate text-ink font-medium">{title}</span>
+      </div>
+      <div class="flex items-center gap-3 shrink-0">
+        <span id="sticky-time-remaining" class="text-muted">{readingTime || '1 min read'}</span>
+        <button
+          id="sticky-top-btn"
+          type="button"
+          class="font-bold text-accent hover:underline cursor-pointer focus:outline-none"
+          aria-label="Scroll to top of page"
+        >
+          &uarr; Top
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Selection Toolbar Floating Menu -->
+  <SelectionToolbar />
+
+  <!-- Image Lightbox Overlay -->
+  <div id="lightbox-overlay" class="lightbox-overlay" aria-hidden="true">
+    <img id="lightbox-img" src="" alt="Enlarged image view" />
+  </div>
+
+  <article class="py-6" data-pagefind-body>
+    <div class="mx-auto max-w-[700px]">
+      <header class="mb-8">
+        <div class="eyebrow flex flex-wrap items-center justify-between gap-y-2">
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+            <a href={`/categories/${slugify(category)}`} class="transition-colors hover:text-accent">
+              {category}
+            </a>
+            <span aria-hidden="true">&middot;</span>
+            <span>Published <FormattedDate date={pubDate} /></span>
+            {readingTime && (
+              <>
+                <span aria-hidden="true">&middot;</span>
+                <span>{readingTime}</span>
+              </>
+            )}
+            {updatedDate && (
+              <>
+                <span aria-hidden="true">&middot;</span>
+                <span>Updated <FormattedDate date={updatedDate} /></span>
+              </>
+            )}
+          </div>
+
+          <!-- Copy Post for AI / Prompt Button -->
+          <button
+            id="copy-ai-btn"
+            class="flex items-center gap-1.5 rounded-full border border-line bg-surface/60 px-3 py-1 font-mono text-[11px] text-muted transition-colors hover:border-accent hover:text-accent focus:outline-none focus:ring-1 focus:ring-accent"
+            title="Copy article markdown for AI / Prompting"
+            data-pagefind-ignore
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+            </svg>
+            <span>Copy for AI</span>
+          </button>
+        </div>
+
+        <h1 class="display post-title mt-4">{title}</h1>
+        <p class="mt-4 font-body text-xl leading-snug text-muted">{description}</p>
+      </header>
+
+      <!-- Audio Player TTS Widget -->
+      <AudioPlayer />
+    </div>
+
+    <!-- Main Article Body Container with Outer Floating Desktop TOC -->
+    <div class="relative mt-8 flex justify-center gap-12">
+      <!-- Desktop Outer Sticky Sidebar TOC (positioned in flex sidebar space on xl viewports) -->
+      {
+        tocHeadings.length >= 2 && (
+          <aside
+            id="desktop-toc-aside"
+            class="hidden xl:block xl:w-56 shrink-0 transition-all duration-300 opacity-50 hover:opacity-100"
+            data-pagefind-ignore
+          >
+            <div class="sticky top-24 max-h-[calc(100vh-8rem)] overflow-y-auto rounded-xl p-3 text-xs">
+              <div class="flex items-center justify-between mb-3 border-b border-line/60 pb-2">
+                <span class="eyebrow font-bold">On this page</span>
+                <button
+                  id="toc-toggle-btn"
+                  class="font-mono text-[11px] text-muted transition-colors hover:text-accent focus:outline-none"
+                  title="Toggle Focus Mode (Hide/Show Outline)"
+                  aria-label="Toggle Table of Contents Focus Mode"
+                >
+                  [ + ]
+                </button>
+              </div>
+              <ul id="toc-list" class="hidden space-y-2 font-display text-muted">
+                {tocHeadings.map((h) => (
+                  <li class={h.depth === 3 ? 'ml-3' : ''}>
+                    <a
+                      href={`#${h.slug}`}
+                      data-toc-slug={h.slug}
+                      class="toc-link block transition-all duration-150 hover:text-accent hover:underline"
+                    >
+                      {h.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+              <button
+                id="toc-collapsed-badge"
+                class="flex items-center gap-1.5 font-mono text-[11px] text-muted hover:text-accent transition-colors py-1"
+                aria-label="Expand Table of Contents"
+              >
+                <span>📍 Outline</span>
+              </button>
+            </div>
+          </aside>
+        )
+      }
+
+      <div class="w-full max-w-[700px]">
+        <!-- Mobile/Tablet Collapsible TOC -->
+        {
+          tocHeadings.length >= 2 && (
+            <nav
+              class="my-6 rounded-xl border border-line bg-surface/40 p-4 text-sm xl:hidden"
+              data-pagefind-ignore
+              aria-label="Table of Contents"
+            >
+              <p class="eyebrow mb-2 font-bold">Table of Contents</p>
+              <ul class="space-y-1.5 font-display text-muted">
+                {tocHeadings.map((h) => (
+                  <li class={h.depth === 3 ? 'ml-4' : ''}>
+                    <a href={`#${h.slug}`} class="transition-colors hover:text-accent hover:underline">
+                      {h.text}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          )
+        }
+
+        <div class="prose">
+          <slot />
+        </div>
+
+        {
+          tags.length > 0 && (
+            <div class="mt-10 flex flex-wrap gap-2" data-pagefind-ignore>
+              {tags.map((tag) => (
+                <a
+                  href={`/tags/${slugify(tag)}`}
+                  class="rounded-full border border-line px-3 py-1 font-mono text-xs text-muted transition-colors hover:border-accent hover:text-accent"
+                >
+                  #{tag}
+                </a>
+              ))}
+            </div>
+          )
+        }
+
+        <!-- Interactive Applause / Clap Button -->
+        <ClapButton />
+
+        <!-- Adjacent Posts Navigation -->
+        {
+          (prevPost || nextPost) && (
+            <div
+              class="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 border-t border-line pt-8"
+              data-pagefind-ignore
+            >
+              {prevPost ? (
+                <a
+                  href={`/blog/${prevPost.id}/`}
+                  class="group rounded-xl border border-line p-4 transition-colors hover:border-accent"
+                >
+                  <span class="eyebrow block text-xs">&larr; Previous</span>
+                  <span class="mt-1 block font-display font-bold text-ink group-hover:text-accent">
+                    {prevPost.title}
+                  </span>
+                </a>
+              ) : (
+                <div />
+              )}
+              {nextPost ? (
+                <a
+                  href={`/blog/${nextPost.id}/`}
+                  class="group rounded-xl border border-line p-4 text-right transition-colors hover:border-accent"
+                >
+                  <span class="eyebrow block text-xs">Next &rarr;</span>
+                  <span class="mt-1 block font-display font-bold text-ink group-hover:text-accent">
+                    {nextPost.title}
+                  </span>
+                </a>
+              ) : (
+                <div />
+              )}
+            </div>
+          )
+        }
+
+        <!-- Related Articles Section -->
+        {
+          relatedPosts.length > 0 && (
+            <div class="mt-12 border-t border-line pt-8" data-pagefind-ignore>
+              <h3 class="eyebrow mb-4 font-bold text-xs uppercase tracking-wider text-muted">Related Articles</h3>
+              <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                {relatedPosts.map((related) => (
+                  <a
+                    href={`/blog/${related.id}/`}
+                    class="group flex flex-col justify-between rounded-xl border border-line p-4 transition-all hover:border-accent hover:shadow-sm"
+                  >
+                    <div>
+                      {related.category && (
+                        <span class="font-mono text-[10px] font-bold text-accent uppercase tracking-wider block mb-1">
+                          {related.category}
+                        </span>
+                      )}
+                      <h4 class="font-display font-bold text-ink group-hover:text-accent text-base leading-snug line-clamp-2">
+                        {related.title}
+                      </h4>
+                      <p class="mt-1 text-xs text-muted font-body line-clamp-2 leading-relaxed">
+                        {related.description}
+                      </p>
+                    </div>
+                    <div class="mt-3 flex items-center justify-between text-[11px] font-mono text-muted border-t border-line/50 pt-2">
+                      <span><FormattedDate date={related.pubDate} /></span>
+                      <span class="text-accent group-hover:underline">Read &rarr;</span>
+                    </div>
+                  </a>
+                ))}
+              </div>
+            </div>
+          )
+        }
+
+        <!-- Newsletter / RSS Subscription CTA -->
+        <NewsletterCTA />
+
+        <footer class="mt-8 border-t border-line pt-6 flex items-center justify-between" data-pagefind-ignore>
+          <a href="/blog" class="font-mono text-sm text-accent transition-colors hover:text-ink">
+            &larr; All writing
+          </a>
+          <a href="/rss.xml" class="font-mono text-xs text-muted transition-colors hover:text-accent">
+            RSS Feed
+          </a>
+        </footer>
+
+        <Comments />
+      </div>
+    </div>
+  </article>
+
+  <!-- Client-side Interactive Scripts -->
+  <script is:inline>
+    (function () {
+      // 1. Reading progress indicator bar & Sticky Reading Header
+      const progressBar = document.getElementById('reading-progress');
+      const stickyNavBar = document.getElementById('sticky-nav-bar');
+      const stickyTimeRemaining = document.getElementById('sticky-time-remaining');
+      const postTitleEl = document.querySelector('.post-title');
+
+      const initialTimeStr = stickyTimeRemaining ? stickyTimeRemaining.textContent || '' : '';
+      const totalMinutesMatch = initialTimeStr.match(/\d+/);
+      const totalMinutes = totalMinutesMatch ? parseInt(totalMinutesMatch[0], 10) : 1;
+
+      const updateProgressAndHeader = () => {
+        const totalHeight = document.documentElement.scrollHeight - window.innerHeight;
+        if (totalHeight <= 0) return;
+        const progress = Math.min(100, Math.max(0, (window.scrollY / totalHeight) * 100));
+        
+        if (progressBar) {
+          progressBar.style.width = progress + '%';
+        }
+
+        // Toggle sticky nav bar past main title
+        if (stickyNavBar && postTitleEl) {
+          const titleBottom = postTitleEl.getBoundingClientRect().bottom;
+          if (titleBottom < 0) {
+            stickyNavBar.classList.add('active');
+          } else {
+            stickyNavBar.classList.remove('active');
+          }
+        }
+
+        // Dynamic remaining reading time calculation
+        if (stickyTimeRemaining && totalMinutes > 0) {
+          const remainingMin = Math.max(1, Math.ceil(totalMinutes * (1 - progress / 100)));
+          stickyTimeRemaining.textContent = `${remainingMin} min left`;
+        }
+      };
+
+      window.addEventListener('scroll', updateProgressAndHeader, { passive: true });
+      updateProgressAndHeader();
+
+      const stickyTopBtn = document.getElementById('sticky-top-btn');
+      if (stickyTopBtn) {
+        stickyTopBtn.addEventListener('click', () => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+
+      // 2. Add language badges & copy button to code blocks
+      document.querySelectorAll('.prose pre').forEach((pre) => {
+        if (pre.querySelector('.copy-code-btn')) return;
+
+        // Detect language from class (e.g. language-typescript, lang-js, shiki)
+        const codeEl = pre.querySelector('code');
+        let langName = '';
+        if (codeEl) {
+          const langClass = Array.from(codeEl.classList).find((c) => c.startsWith('language-') || c.startsWith('lang-'));
+          if (langClass) {
+            langName = langClass.replace(/^language-|^lang-/, '').toUpperCase();
+          }
+        }
+
+        if (langName) {
+          const langBadge = document.createElement('span');
+          langBadge.className = 'font-mono text-[10px] font-bold text-muted uppercase tracking-wider select-none pr-12';
+          langBadge.textContent = langName;
+          pre.prepend(langBadge);
+        }
+
+        const button = document.createElement('button');
+        button.className = 'copy-code-btn';
+        button.textContent = 'Copy';
+        button.setAttribute('aria-label', 'Copy code snippet');
+
+        button.addEventListener('click', async () => {
+          const code = pre.querySelector('code')?.innerText || pre.innerText;
+          try {
+            await navigator.clipboard.writeText(code);
+            button.textContent = 'Copied!';
+            setTimeout(() => {
+              button.textContent = 'Copy';
+            }, 2000);
+          } catch (err) {
+            button.textContent = 'Failed';
+          }
+        });
+
+        pre.style.position = 'relative';
+        pre.appendChild(button);
+      });
+
+      // 3. Image Lightbox Zoom
+      const lightboxOverlay = document.getElementById('lightbox-overlay');
+      const lightboxImg = document.getElementById('lightbox-img');
+      if (lightboxOverlay && lightboxImg) {
+        document.querySelectorAll('.prose img').forEach((img) => {
+          img.addEventListener('click', () => {
+            lightboxImg.src = img.src;
+            lightboxImg.alt = img.alt || 'Enlarged image view';
+            lightboxOverlay.classList.add('active');
+            lightboxOverlay.setAttribute('aria-hidden', 'false');
+          });
+        });
+
+        const closeLightbox = () => {
+          lightboxOverlay.classList.remove('active');
+          lightboxOverlay.setAttribute('aria-hidden', 'true');
+        };
+
+        lightboxOverlay.addEventListener('click', closeLightbox);
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && lightboxOverlay.classList.contains('active')) {
+            closeLightbox();
+          }
+        });
+      }
+
+      // 4. Active Section Highlight for Sticky Desktop TOC via IntersectionObserver
+      const tocLinks = document.querySelectorAll('.toc-link');
+      if (tocLinks.length > 0 && 'IntersectionObserver' in window) {
+        const headingMap = new Map();
+        tocLinks.forEach((link) => {
+          const slug = link.getAttribute('data-toc-slug');
+          const heading = document.getElementById(slug);
+          if (heading) headingMap.set(heading, link);
+        });
+
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                const activeLink = headingMap.get(entry.target);
+                if (activeLink) {
+                  tocLinks.forEach((l) => l.classList.remove('toc-link-active'));
+                  activeLink.classList.add('toc-link-active');
+                }
+              }
+            });
+          },
+          { rootMargin: '-80px 0px -60% 0px' }
+        );
+
+        headingMap.forEach((_, heading) => observer.observe(heading));
+      }
+
+      // 5. Heading Permalink Copy Anchors
+      document.querySelectorAll('.prose h2, .prose h3').forEach((heading) => {
+        if (!heading.id || heading.querySelector('.heading-anchor')) return;
+        const anchor = document.createElement('a');
+        anchor.className = 'heading-anchor';
+        anchor.href = `#${heading.id}`;
+        anchor.textContent = '#';
+        anchor.setAttribute('aria-label', `Link to section ${heading.innerText}`);
+
+        anchor.addEventListener('click', async (e) => {
+          e.preventDefault();
+          const permalink = `${window.location.origin}${window.location.pathname}#${heading.id}`;
+          try {
+            await navigator.clipboard.writeText(permalink);
+            history.pushState(null, '', `#${heading.id}`);
+            const orig = anchor.textContent;
+            anchor.textContent = '✓';
+            setTimeout(() => { anchor.textContent = orig; }, 1500);
+          } catch (err) {
+            console.error('Failed to copy permalink', err);
+          }
+        });
+
+        heading.prepend(anchor);
+      });
+
+      // 6. Copy Post for AI / Prompt Button
+      const copyAiBtn = document.getElementById('copy-ai-btn');
+      if (copyAiBtn) {
+        copyAiBtn.addEventListener('click', async () => {
+          const prose = document.querySelector('.prose');
+          const titleEl = document.querySelector('.post-title');
+          if (!prose) return;
+
+          const title = titleEl ? titleEl.innerText : document.title;
+          const cleanText = prose.innerText;
+          const aiPromptPayload = `# Blog Post: ${title}\nURL: ${window.location.href}\n\n---\n\n${cleanText}`;
+
+          try {
+            await navigator.clipboard.writeText(aiPromptPayload);
+            const span = copyAiBtn.querySelector('span');
+            if (span) {
+              const orig = span.textContent;
+              span.textContent = 'Copied for AI!';
+              setTimeout(() => { span.textContent = orig; }, 2000);
+            }
+          } catch (err) {
+            console.error('Failed to copy post for AI', err);
+          }
+        });
+      }
+
+      // 7. Focus Mode & TOC Collapse Toggle (Default: Contracted/Collapsed)
+      const tocToggleBtn = document.getElementById('toc-toggle-btn');
+      const tocList = document.getElementById('toc-list');
+      const tocBadge = document.getElementById('toc-collapsed-badge');
+
+      if (tocToggleBtn && tocList && tocBadge) {
+        const isExpanded = localStorage.getItem('toc_collapsed') === 'false';
+
+        const setCollapsed = (collapsed) => {
+          if (collapsed) {
+            tocList.classList.add('hidden');
+            tocBadge.classList.remove('hidden');
+            tocBadge.classList.add('flex');
+            tocToggleBtn.textContent = '[ + ]';
+            localStorage.setItem('toc_collapsed', 'true');
+          } else {
+            tocList.classList.remove('hidden');
+            tocBadge.classList.add('hidden');
+            tocBadge.classList.remove('flex');
+            tocToggleBtn.textContent = '[ \u2212 ]';
+            localStorage.setItem('toc_collapsed', 'false');
+          }
+        };
+
+        // Initialize state (default to contracted unless user previously expanded)
+        setCollapsed(!isExpanded);
+
+        tocToggleBtn.addEventListener('click', () => {
+          const currentlyCollapsed = tocList.classList.contains('hidden');
+          setCollapsed(!currentlyCollapsed);
+        });
+
+        tocBadge.addEventListener('click', () => {
+          setCollapsed(false);
+        });
+      }
+    })();
+  </script>
+</BaseLayout>

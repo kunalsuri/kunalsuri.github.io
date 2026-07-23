@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <defs>
+    <radialGradient id="spotlight-grad" cx="50%" cy="45%" r="50%">
+      <stop offset="0%" stop-color="var(--spot)" stop-opacity="var(--spot-opacity)" />
+      <stop offset="100%" stop-color="var(--spot)" stop-opacity="0" />
+    </radialGradient>
+  </defs>
+  <style>
+    :root {
+      --bg: #faf9f6;
+      --fg: #17150f;
+      --accent: #8a6a26;
+      --spot: #8a6a26;
+      --spot-opacity: 0.35;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0a0a0b;
+        --fg: #ece7db;
+        --accent: #d8b45f;
+        --spot: #d8b45f;
+        --spot-opacity: 0.45;
+      }
+    }
+    .bg {
+      fill: var(--bg);
+      transition: fill 0.3s ease;
+    }
+    .glyph {
+      fill: var(--fg);
+      transition: fill 0.3s ease;
+    }
+    .dot {
+      fill: var(--accent);
+      transition: fill 0.3s ease;
+    }
+  </style>
+  <rect class="bg" width="32" height="32" rx="8" />
+  <rect x="0" y="0" width="32" height="28" fill="url(#spotlight-grad)" />
+  <path class="glyph" d="M 7 7 H 11 V 14 L 19 7 H 23 L 15 14 L 23 25 H 19 L 11 15 V 25 H 7 Z" />
+  <circle class="dot" cx="26.5" cy="23" r="2" />
+</svg>

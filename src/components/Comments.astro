@@ -1,0 +1,58 @@
+---
+import { GISCUS, isCommentsConfigured } from '../consts';
+
+// Renders giscus (GitHub Discussions comments) ONLY once a category id is set
+// in consts.ts. Until then the container is omitted and the script no-ops, so
+// the build stays clean and no broken widget appears. Activation: see consts.ts.
+const enabled = isCommentsConfigured();
+---
+
+{
+  enabled && (
+    <section data-pagefind-ignore class="mt-16 border-t border-line pt-10">
+      <h2 class="eyebrow mb-6">Comments</h2>
+      <div id="giscus" />
+    </section>
+  )
+}
+
+<script is:inline define:vars={{ cfg: GISCUS }}>
+  (function () {
+    if (!cfg.categoryId) return; // not configured yet — do nothing
+    const container = document.getElementById('giscus');
+    if (!container) return;
+
+    const giscusTheme = (t) => (t === 'dark' ? 'dark_dimmed' : 'light');
+    const current = document.documentElement.classList.contains('dark')
+      ? 'dark'
+      : 'light';
+
+    const s = document.createElement('script');
+    s.src = 'https://giscus.app/client.js';
+    s.async = true;
+    s.crossOrigin = 'anonymous';
+    s.setAttribute('data-repo', cfg.repo);
+    s.setAttribute('data-repo-id', cfg.repoId);
+    s.setAttribute('data-category', cfg.category);
+    s.setAttribute('data-category-id', cfg.categoryId);
+    s.setAttribute('data-mapping', cfg.mapping);
+    s.setAttribute('data-strict', '0');
+    s.setAttribute('data-reactions-enabled', cfg.reactionsEnabled);
+    s.setAttribute('data-emit-metadata', '0');
+    s.setAttribute('data-input-position', 'top');
+    s.setAttribute('data-theme', giscusTheme(current));
+    s.setAttribute('data-lang', 'en');
+    s.setAttribute('data-loading', 'lazy');
+    container.appendChild(s);
+
+    // Keep giscus in step with the site's dark-mode toggle.
+    document.addEventListener('theme-change', (e) => {
+      const frame = document.querySelector('iframe.giscus-frame');
+      if (!frame) return;
+      frame.contentWindow.postMessage(
+        { giscus: { setConfig: { theme: giscusTheme(e.detail) } } },
+        'https://giscus.app',
+      );
+    });
+  })();
+</script>
