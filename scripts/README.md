@@ -41,8 +41,8 @@ Then from the repository root:
 | Step | Command | Purpose |
 |:-----|:--------|:--------|
 | Type check | `npm run check` | Astro + TypeScript diagnostics |
-| Unit tests | `npm run test:unit` | Fast utility/constant tests |
-| Integration tests | `npm run test:integration` | Blog content, build output, RSS, SEO |
+| Unit tests | `npm run test:unit` | Utility, constant, markdown preview, & Studio FS tests (6 test suites) |
+| Integration tests | `npm run test:integration` | Blog content, build output, RSS, AI discoverability, & reader experience tests (7 test suites) |
 | Production build | `npm run build` | Same build CI runs on deploy (+ Pagefind index) |
 
 ## Publishing

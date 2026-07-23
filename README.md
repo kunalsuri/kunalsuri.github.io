@@ -11,7 +11,7 @@
 [![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org)
 [![GitHub Pages](https://img.shields.io/badge/GitHub_Pages-222222?style=for-the-badge&logo=github&logoColor=white)](https://kunalsuri.github.io)
 
-[🌐 **Live Site →**](https://kunalsuri.github.io) &nbsp;·&nbsp; [📚 Blog](https://kunalsuri.github.io/blog)
+[🌐 **Live Site →**](https://kunalsuri.github.io) &nbsp;·&nbsp; [📚 Blog](https://kunalsuri.github.io/blog) &nbsp;·&nbsp; [📜 Changelog](CHANGELOG.md) &nbsp;·&nbsp; [🛡️ Security](SECURITY.md)
 </div>
 
 <br>
@@ -63,7 +63,8 @@ A persistent DOI for the full archive will be made available via [Zenodo](https:
 | **Language** | [TypeScript](https://www.typescriptlang.org) (strict) + `astro check` |
 | **Islands** | [Preact](https://preactjs.com) (compat) — ready for interactivity when needed |
 | **Search** | [Pagefind](https://pagefind.app) — static search index, built post-build |
-| **Feeds** | RSS (`/rss.xml`) + Sitemap (`/sitemap-index.xml`) |
+| **Feeds & AI** | RSS (`/rss.xml`), Sitemap (`/sitemap-index.xml`), AI discoverability (`/llms.txt`, `/llms-full.txt`) |
+| **CMS Environment** | Studio local interactive CMS (`/studio` dev route via Vite middleware plugin) |
 | **Deployment** | GitHub Actions → GitHub Pages (automatic on push to `main`) |
 
 <br>
@@ -97,7 +98,7 @@ npm run check
 
 ## 🧪 Testing
 
-The project includes an extensive **Vitest** test suite covering unit tests, content validation, build output, and SEO integrity.
+The project includes an extensive **Vitest** test suite covering unit tests, content validation, build output, reader experience, AI discoverability, and SEO integrity.
 
 ### Quick Start
 
@@ -119,15 +120,21 @@ npm run test:watch
 
 ```
 tests/
-├── unit/                     # Fast, pure-function tests (no Astro runtime)
-│   ├── reading-time.test.ts  # readingTime() — word count and edge cases
-│   ├── taxonomy.test.ts      # slugify() — URL-safe slug generation
-│   └── consts.test.ts        # Site constants — shape and value guards
-└── integration/              # File-system and build-output tests
-    ├── content-schema.test.ts  # Zod schema for blog front-matter
-    ├── blog-posts.test.ts      # Validates actual .md/.mdx files on disk
-    ├── build.test.ts           # Build output — pages, SEO tags, links
-    └── rss.test.ts             # RSS feed structure and content
+├── unit/                       # Fast, pure-function & module tests (no Astro runtime)
+│   ├── consts.test.ts          # Site constants — shape and value guards
+│   ├── markdown-preview.test.ts# Live markdown preview & asset URL rewrites
+│   ├── reading-time.test.ts    # readingTime() — word count and edge cases
+│   ├── studio-fs.test.ts       # Studio local filesystem operations & post file handling
+│   ├── studio.test.ts          # Studio state & management utilities
+│   └── taxonomy.test.ts        # slugify() — URL-safe slug generation
+└── integration/                # File-system, reader-experience, and build-output tests
+    ├── ai-discoverability.test.ts# llms.txt & llms-full.txt feeds validation
+    ├── blog-posts.test.ts        # Validates actual .md/.mdx files on disk
+    ├── build.test.ts             # Build output — pages, SEO tags, links
+    ├── content-schema.test.ts    # Zod schema for blog front-matter
+    ├── ensure-build.ts           # Concurrency-safe build lock helper
+    ├── reader-experience.test.ts # Layout, reading experience, and theme toggle guards
+    └── rss.test.ts               # RSS feed structure and content
 ```
 
 | Layer | What it tests | Speed |

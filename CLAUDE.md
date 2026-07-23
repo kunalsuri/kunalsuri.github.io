@@ -1,108 +1,144 @@
 # CLAUDE.md
 
 > Persistent instructions for Claude Code sessions on this repository.
+> Follows the open [AGENTS.md](https://agents.md) standard. Exact mirror of [AGENTS.md](AGENTS.md).
 
 ## Project Overview
 
-Personal blog & portfolio for Kunal Suri. Static site built with **Astro 7**, **Tailwind CSS v4**, **TypeScript (strict)**, and **Preact** (islands). Deployed to **GitHub Pages** via GitHub Actions on every push to `main`.
+**kunalsuri.github.io** — Kunal Suri's personal blog & portfolio.
+Static site: [Astro 7](https://astro.build) · [Tailwind CSS v4](https://tailwindcss.com) · TypeScript (strict) · [Preact](https://preactjs.com) islands.
+Deployed via GitHub Actions → GitHub Pages.
 
-Live: https://kunalsuri.github.io
+Live site: https://kunalsuri.github.io
 
-## Architecture
+## Setup & Development Scripts (Token Efficient)
 
-```
-src/
-├── components/     # Astro components (BaseHead, Header, Footer, PostCard, ThemeToggle, Comments, FormattedDate)
-├── content/blog/   # Markdown / MDX blog posts (glob-loaded via Content Layer)
-├── layouts/        # BaseLayout.astro, BlogPost.astro
-├── pages/          # Route files (index, about, archive, search, rss.xml.js, blog/[...slug], tags/, categories/)
-├── styles/         # global.css — Tailwind v4 CSS-first config (no tailwind.config.js)
-├── utils/          # posts.ts, reading-time.ts, taxonomy.ts
-├── consts.ts       # Site-wide constants (SITE_TITLE, SOCIAL, NAV_LINKS, GISCUS)
-└── content.config.ts  # Astro Content Layer schema (title, description, pubDate, category, tags, draft)
-public/             # Static assets (favicon.svg only)
+To reduce token wastage and avoid multi-turn prompt overhead, agents **MUST** use the automated setup and verification scripts located in `scripts/` instead of running multiple fragmented terminal commands:
+
+### Windows (PowerShell)
+```powershell
+.\scripts\win\dev-setup.ps1   # Token-efficient setup: install deps + type check
+.\scripts\win\dev-tests.ps1   # Token-efficient test: type check + unit tests + integration tests + build
+.\scripts\win\dev-run.ps1     # Dev server → http://localhost:4321
 ```
 
-## Essential Commands & Helper Scripts (Token-Efficient Workflow)
-
-> **REDUCE TOKEN WASTAGE:** Always prefer running the consolidated helper scripts in `scripts/` to verify setup, npm dependencies, tests, and builds in a single step rather than running multiple fragmented commands.
-
-### Automated Setup & Verification Scripts
-- **Windows (PowerShell):**
-  - Setup & NPM test: `.\scripts\win\dev-setup.ps1` (install deps + type check)
-  - Full Test & Build: `.\scripts\win\dev-tests.ps1` (type check + unit tests + integration tests + build)
-  - Dev Server: `.\scripts\win\dev-run.ps1`
-- **Linux / macOS (Bash):**
-  - Setup & NPM test: `./scripts/linux/dev-setup.sh` (install deps + type check)
-  - Full Test & Build: `./scripts/linux/dev-tests.sh` (type check + unit tests + integration tests + build)
-  - Dev Server: `./scripts/linux/dev-run.sh`
-
-### Individual NPM Commands (Targeted Use Only)
+### Linux / macOS (Bash)
 ```bash
-npm install          # Install dependencies
-npm run check        # Type-check with astro check
-npm run test:unit    # Fast unit tests only
-npm run test:integration # Integration tests only
-npm run build        # Production build → dist/
-npm run dev          # Dev server → http://localhost:4321
-npm run preview      # Preview production build locally
+./scripts/linux/dev-setup.sh  # Token-efficient setup: install deps + type check
+./scripts/linux/dev-tests.sh  # Token-efficient test: type check + unit tests + integration tests + build
+./scripts/linux/dev-run.sh    # Dev server → http://localhost:4321
 ```
 
-Pagefind search index builds automatically via the `postbuild` script (`pagefind --site dist`).
+> **TOKEN SAVING RULE:** Running `dev-setup` or `dev-tests` bundles setup, dependencies testing, type checking, unit tests, integration tests, and production build into a single command execution, saving context tokens and conversation turns.
 
-## Coding Rules
+### Individual NPM Commands
+Use individual npm commands only when debugging a specific component:
+```bash
+npm install          # Install all dependencies
+npm run check        # Run astro check (type-checking)
+npm run test         # Run full Vitest test suite
+npm run test:unit    # Fast unit tests only (tests/unit)
+npm run test:integration # Integration tests only (tests/integration)
+npm run build        # Production build to dist/
+npm run dev          # Start dev server at http://localhost:4321
+npm run preview      # Preview the built site locally
+```
 
-- Use **TypeScript strict** mode. Never add `// @ts-ignore` or `any` without explaining why.
-- Use **Astro components** (`.astro`) for all UI. Use **Preact** (`.tsx`) only for interactive islands that require client-side state.
-- Styling is **Tailwind CSS v4** via the Vite plugin — all config lives in `src/styles/global.css`. There is no `tailwind.config.js`.
-- Import paths: use relative paths within `src/`. No `@/` alias is configured.
-- Prefer **named exports**. Default exports only where Astro/framework requires them.
-- Content schema is defined in `src/content.config.ts`. If you add a frontmatter field, add it to the Zod schema there.
-- Keep components small and focused. Do not create "god components."
+The `postbuild` script runs Pagefind automatically (`pagefind --site dist`) to generate the static search index.
 
-## Blog Post Conventions
+## Architecture Map
 
-Posts live in `src/content/blog/` as `.md` or `.mdx`. Required frontmatter:
+```
+├── astro.config.mjs        # Astro config — site URL, integrations (MDX, Sitemap, Preact), Tailwind v4 Vite plugin, Studio plugin
+├── studio-server-plugin.mjs # Dev-only Vite plugin for Studio local backend (posts CRUD, asset serving, image search)
+├── tsconfig.json            # Extends astro/tsconfigs/strict, JSX → Preact
+├── vitest.config.ts         # Vitest test configuration
+├── package.json             # Scripts, deps (Astro 7, Preact, Tailwind v4, Pagefind, Vitest)
+├── AGENTS.md                # Agent instructions (mirrored with CLAUDE.md)
+├── CLAUDE.md                # Claude Code instructions (mirrored with AGENTS.md)
+├── CHANGELOG.md             # Keep a Changelog release notes
+├── SECURITY.md              # Security vulnerability reporting & automated tooling policies
+├── src/
+│   ├── consts.ts            # Site-wide constants: SITE_TITLE, SITE_URL, AUTHOR, SOCIAL, NAV_LINKS, GISCUS
+│   ├── content.config.ts    # Content Layer schema (Zod): title, description, pubDate, category, tags, draft
+│   ├── components/          # Astro & Preact components: BaseHead, Header, Footer, PostCard, ThemeToggle, Comments, studio/
+│   ├── layouts/             # BaseLayout.astro (site chrome), BlogPost.astro (post wrapper)
+│   ├── pages/               # Routes: index, about, archive, search, rss.xml.js, llms.txt.ts, llms-full.txt.ts, blog/, tags/, categories/, studio/, api/
+│   ├── styles/global.css    # Tailwind CSS v4 config (CSS-first, no tailwind.config.js)
+│   ├── utils/               # posts.ts (query helpers), reading-time.ts, taxonomy.ts (tag/category extraction)
+│   └── content/blog/        # Blog posts as .md / .mdx — filename = URL slug
+├── tests/                   # Vitest test suite
+│   ├── unit/                # Unit tests: consts, markdown-preview, reading-time, studio-fs, studio, taxonomy
+│   └── integration/         # Integration tests: ai-discoverability, blog-posts, build, content-schema, reader-experience, rss
+├── scripts/                 # Token-efficient Windows & Linux dev scripts
+├── public/                  # Static assets (favicon.svg)
+├── .github/workflows/       # ci.yml, codeql-analysis.yml, deploy.yml
+├── LICENSE                  # Apache 2.0 (source code)
+└── CONTENT_LICENSE          # CC BY 4.0 (blog content)
+```
+
+## Code Style & Rules
+
+- **TypeScript strict mode** — do not add `@ts-ignore` or `any` without justification.
+- **Astro components** (`.astro`) for all UI. Use Preact (`.tsx`) only when client-side interactivity is required.
+- **Tailwind CSS v4** — configured as a Vite plugin. All theme config lives in `src/styles/global.css`. There is **no** `tailwind.config.js`.
+- **Named exports** preferred. Default exports only where required by framework conventions.
+- **Relative imports** within `src/`. No path aliases are configured.
+- Keep components small, focused, and reusable. Do not create "god components."
+
+## Content Schema & Blog Posts
+
+Posts in `src/content/blog/` must include this frontmatter:
 
 ```yaml
 title: "Post Title"
-description: "One-line summary for SEO and post list."
+description: "SEO summary."
 pubDate: 2026-07-09
-tags: ["tag"]
 ```
 
-Optional: `updatedDate`, `category` (defaults to "Notes"), `draft` (defaults to false; draft posts are hidden in production).
+Optional fields: `updatedDate` (date), `category` (string, default "Notes"), `tags` (string[], default []), `draft` (boolean, default false).
 
-The filename becomes the URL slug: `my-post.md` → `/blog/my-post/`.
+The Zod schema is defined in `src/content.config.ts`. Any new frontmatter field **must** be added there.
 
-## Deployment
+Filename maps to URL slug: `my-post.md` → `/blog/my-post/`.
 
-- Push to `main` triggers `.github/workflows/deploy.yml`.
-- Uses `withastro/action` to build and deploy to GitHub Pages.
-- **Never commit directly to `main` without verifying the build passes locally.**
+## Testing & Verification (Token-Efficient Checklist)
 
-## Verification Checklist (Token-Saving Protocol)
-
-Before finishing any task, run the automated verification script to execute all checks in a single step and reduce token usage:
+Before marking work complete, agents **must** run the consolidated verification script to execute type-checking, unit tests, integration tests, and production build in a single step, saving token usage:
 
 - **Windows (PowerShell):** `.\scripts\win\dev-tests.ps1`
 - **Linux / macOS (Bash):** `./scripts/linux/dev-tests.sh`
 
-This script executes all 4 gates in one pass:
-1. `npm run check` — must pass with zero errors.
-2. `npm run test:unit` & `npm run test:integration` — unit and integration tests must pass.
-3. `npm run build` — production build must complete without errors.
-4. Visually confirm dev server (`npm run dev` / `dev-run`) if UI was changed.
+This script executes all 4 required gates in one pass:
+1. `npm run check` — type check (zero errors)
+2. `npm run test:unit` — unit tests (6 test suites)
+3. `npm run test:integration` — integration tests (7 test suites)
+4. `npm run build` — production build (+ Pagefind index)
 
-## Licensing — Do Not Violate
+> **Debugging Note:** For fast targeted iteration during local debugging, agents may run `npm run test:unit` or `npm run check` individually.
 
-- Source code: **Apache License 2.0** (`LICENSE`).
-- Blog content in `src/content/blog/`: **CC BY 4.0** (`CONTENT_LICENSE`). Do not copy or relocate blog content without attribution.
+If UI was changed, visually verify with `npm run dev`.
 
-## Things to Avoid
+## Deployment & CI/CD
 
-- Do not install Prettier, ESLint, or any new linter without asking first.
-- Do not add React — use Preact with compat (`jsxImportSource: "preact"` in tsconfig).
-- Do not create a `tailwind.config.js` — Tailwind v4 is CSS-first.
-- Do not modify the GitHub Actions workflow without asking first.
-- Do not store secrets, API keys, or credentials anywhere in the repo.
+- Every push to `main` triggers `.github/workflows/deploy.yml`.
+- Build uses `withastro/action` and publishes to GitHub Pages automatically.
+- Pull requests and pushes run automated testing via `.github/workflows/ci.yml` and CodeQL analysis via `.github/workflows/codeql-analysis.yml`.
+- Do not modify CI/CD workflows without explicit approval.
+
+## Constraints & Guardrails
+
+- **No React** — this project uses Preact with the compatibility shim (`jsxImportSource: "preact"`).
+- **No `tailwind.config.js`** — Tailwind v4 is CSS-first; config is in `src/styles/global.css`.
+- **No new linters or formatters** (Prettier, ESLint, etc.) unless explicitly requested.
+- **Do not commit secrets**, API keys, or credentials.
+- **Respect the dual license**: source code is Apache 2.0 (`LICENSE`); blog content (`src/content/blog/`) is CC BY 4.0 (`CONTENT_LICENSE`).
+- **Do not push directly to `main`** without verifying the build passes.
+
+## Special Features & Workflow Notes
+
+- **Claude / Agents Mirroring**: `CLAUDE.md` and `AGENTS.md` are exact content mirrors and must be kept updated in lockstep.
+- **AI Discoverability**: `/llms.txt` and `/llms-full.txt` provide LLM-friendly documentation feeds.
+- **Studio CMS Environment**: Local interactive post management available at `/studio` in dev mode (`npm run dev`), powered by `studio-server-plugin.mjs`.
+- **Giscus Comments**: Pre-wired in `src/consts.ts` and `src/components/Comments.astro` (requires `categoryId` when activated).
+- **RSS & Sitemap**: RSS feed at `/rss.xml`; sitemap at `/sitemap-index.xml`.
