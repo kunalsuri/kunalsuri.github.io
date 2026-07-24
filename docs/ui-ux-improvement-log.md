@@ -83,7 +83,10 @@ manual look at the affected page(s) in the dev server.
       id="main-content" tabindex="-1">` so keyboard focus actually lands there
       (verified with Playwright: Tab → Enter moves `document.activeElement` to
       `MAIN#main-content`, not just scroll position).
-- [ ] 3. Custom 404 page
+- [x] 3. Custom 404 page — `src/pages/404.astro`, on-brand (eyebrow/display
+      heading/body/CTA), builds to `dist/404.html` (verified), correctly
+      excluded from the sitemap (`@astrojs/sitemap` excludes `404`/`500` by
+      default — verified in build output), checked in light + dark.
 - [ ] 4. NewsletterCTA palette realignment
 - [ ] 5. `aria-current="page"` on active nav link
 - [ ] 6. AudioPlayer state announcements
