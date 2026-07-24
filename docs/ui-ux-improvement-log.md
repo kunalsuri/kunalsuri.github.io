@@ -104,6 +104,11 @@ manual look at the affected page(s) in the dev server.
       code trace + existing widget-render test; this sandbox's headless
       Chromium has no speech engine to exercise the real Web Speech API
       end-to-end, same limitation the feature already had before this change.)
-- [ ] 7. `prefers-reduced-motion` coverage for remaining animations
+- [x] 7. `prefers-reduced-motion` coverage for remaining animations — added a
+      single rule in `global.css`'s existing reduced-motion query that cuts
+      all animation/transition durations to ~0 (end states unchanged) rather
+      than chasing every hover-lift/scale/ping/keyframe individually. Verified
+      with Playwright's `reducedMotion: 'reduce'` emulation: home page hero
+      renders fully visible immediately, no broken layout.
 
 Entries are checked off with a commit reference as each unit lands, below.
