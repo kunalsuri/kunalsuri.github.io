@@ -78,7 +78,11 @@ manual look at the affected page(s) in the dev server.
       generate the PNG, don't render), then rasterized to `public/og-default.png`
       via `sharp` (already a transitive dep). `BaseHead.astro` now points
       `og:image`/`twitter:image` at the PNG and adds `og:image:type/width/height`.
-- [ ] 2. Skip-to-content link
+- [x] 2. Skip-to-content link — added to `BaseLayout.astro` (visually hidden
+      until focused, `.skip-link` in `global.css`), targets `<main
+      id="main-content" tabindex="-1">` so keyboard focus actually lands there
+      (verified with Playwright: Tab → Enter moves `document.activeElement` to
+      `MAIN#main-content`, not just scroll position).
 - [ ] 3. Custom 404 page
 - [ ] 4. NewsletterCTA palette realignment
 - [ ] 5. `aria-current="page"` on active nav link

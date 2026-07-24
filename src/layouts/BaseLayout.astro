@@ -29,9 +29,10 @@ const { title, description, spotlight = false, containerClass = 'max-w-2xl', art
     <BaseHead title={title} description={description} article={article} />
   </head>
   <body>
+    <a href="#main-content" class="skip-link">Skip to content</a>
     <div class:list={['mx-auto flex min-h-screen flex-col px-5 sm:px-6', containerClass]}>
       <Header />
-      <main class:list={['flex-1', spotlight && 'spotlight']}>
+      <main id="main-content" tabindex="-1" class:list={['flex-1', spotlight && 'spotlight']}>
         <slot />
       </main>
       <Footer />
