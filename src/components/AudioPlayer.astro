@@ -14,6 +14,7 @@
         id="tts-play-btn"
         class="flex h-9 w-9 items-center justify-center rounded-full bg-accent text-paper transition-transform hover:scale-105 active:scale-95 focus:outline-none focus:ring-2 focus:ring-accent"
         aria-label="Listen to post"
+        aria-pressed="false"
       >
         <svg id="tts-play-icon" class="h-4 w-4 fill-current ml-0.5" viewBox="0 0 24 24">
           <path d="M8 5v14l11-7z"></path>
@@ -25,7 +26,7 @@
 
       <div>
         <span class="font-display font-medium text-ink block text-xs sm:text-sm">Listen to post</span>
-        <span id="tts-status" class="font-mono text-[11px] text-muted">Web Speech AI Reader</span>
+        <span id="tts-status" class="font-mono text-[11px] text-muted" role="status" aria-live="polite">Web Speech AI Reader</span>
       </div>
     </div>
 
@@ -99,6 +100,8 @@
         pauseIcon?.classList.remove('hidden');
         stopBtn?.classList.remove('hidden');
         progressBar?.classList.remove('hidden');
+        playBtn?.setAttribute('aria-pressed', 'true');
+        playBtn?.setAttribute('aria-label', 'Pause playback');
         if (statusText) statusText.textContent = `Playing (${rates[currentRateIndex]}x)...`;
       };
 
@@ -131,6 +134,8 @@
       progressBar?.classList.add('hidden');
       if (progressFill) progressFill.style.width = '0%';
       if (statusText) statusText.textContent = 'Web Speech AI Reader';
+      playBtn?.setAttribute('aria-pressed', 'false');
+      playBtn?.setAttribute('aria-label', 'Listen to post');
     };
 
     playBtn?.addEventListener('click', () => {
@@ -140,11 +145,15 @@
         synth.pause();
         playIcon?.classList.remove('hidden');
         pauseIcon?.classList.add('hidden');
+        playBtn?.setAttribute('aria-pressed', 'false');
+        playBtn?.setAttribute('aria-label', 'Resume playback');
         if (statusText) statusText.textContent = 'Paused';
       } else if (synth.paused) {
         synth.resume();
         playIcon?.classList.add('hidden');
         pauseIcon?.classList.remove('hidden');
+        playBtn?.setAttribute('aria-pressed', 'true');
+        playBtn?.setAttribute('aria-label', 'Pause playback');
         if (statusText) statusText.textContent = `Playing (${rates[currentRateIndex]}x)...`;
       }
     });

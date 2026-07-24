@@ -21,6 +21,7 @@ const isActive = (href: string) =>
       NAV_LINKS.map((link) => (
         <a
           href={link.href}
+          aria-current={isActive(link.href) ? 'page' : undefined}
           class:list={[
             'rounded-md px-2 py-1 font-display text-sm font-medium transition-colors hover:text-accent',
             isActive(link.href) ? 'text-ink' : 'text-muted',

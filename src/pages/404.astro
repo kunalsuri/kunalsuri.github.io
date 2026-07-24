@@ -1,0 +1,29 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Page not found" description="This page doesn't exist.">
+  <section class="flex min-h-[60vh] flex-col justify-center py-16">
+    <p class="eyebrow">404</p>
+    <h1 class="display mt-4 text-4xl sm:text-5xl">Nothing here.</h1>
+    <p class="mt-4 max-w-md font-body text-lg text-muted">
+      The page you're looking for doesn't exist, moved, or never did. Let's get you
+      back on track.
+    </p>
+    <div class="mt-8 flex flex-wrap items-center gap-5">
+      <a
+        href="/"
+        class="inline-flex items-center gap-2 rounded-full bg-ink px-5 py-2.5 font-display text-sm font-semibold text-paper transition-transform hover:-translate-y-0.5"
+      >
+        Back home
+        <span aria-hidden="true">&rarr;</span>
+      </a>
+      <a href="/blog" class="font-display text-sm font-medium text-muted transition-colors hover:text-accent">
+        All writing
+      </a>
+      <a href="/search" class="font-display text-sm font-medium text-muted transition-colors hover:text-accent">
+        Search
+      </a>
+    </div>
+  </section>
+</BaseLayout>

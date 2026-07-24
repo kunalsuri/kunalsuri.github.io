@@ -1,0 +1,129 @@
+# UI/UX Improvement Log
+
+> Principal UI/UX + frontend audit of kunalsuri.github.io.
+> Tracks the plan, acceptance criteria, and rolling progress for this pass.
+> Branch: `claude/frontend-ui-ux-audit-s1rixi`
+
+## Audit method
+
+Read through the full page/component/layout/style surface (`BaseLayout`, `Header`,
+`Footer`, `BlogPost`, `PostCard`, `BaseHead`, `global.css`, all top-level pages,
+and the interactive Astro islands: `ClapButton`, `AudioPlayer`,
+`SelectionToolbar`, `NewsletterCTA`, `Comments`, `ThemeToggle`). Checked color
+contrast math for the token palette (light + dark), reviewed `astro.config.mjs`
+and `package.json` for available tooling, and rendered the site at 320/390/768/1440
+widths in a real browser to confirm layout claims before writing them down.
+
+The site's existing "Keynote" design system is deliberate and well executed —
+this pass is corrective/polish, not a redesign. Every item below preserves the
+current architecture, components, and dependency set (one addition: a static
+PNG asset generated from the existing SVG, using `sharp`, which is already a
+transitive dependency via Astro's image pipeline — no new package installed).
+
+## Findings ranked by impact
+
+| # | Improvement | User impact | Frequency | Consistency benefit | Confidence | Regression risk |
+|---|---|---|---|---|---|---|
+| 1 | Social share preview image is broken on most platforms | High — broken previews on every shared link | Every share (LinkedIn/Twitter/Slack/iMessage/Facebook) | N/A (bug fix) | High | Low |
+| 2 | No "Skip to content" link | High for keyboard/screen-reader users | Every page load | Site-wide | High | Low |
+| 3 | No custom 404 page | High for anyone hitting a dead/typo'd link | Occasional but real (GitHub Pages serves `404.html` automatically) | Site-wide | High | Low |
+| 4 | `NewsletterCTA` breaks the site's restrained color language | Medium — visual inconsistency on every post | Every article view | High — realigns with "boldness spent in ONE place" principle | High | Low |
+| 5 | Active nav link isn't exposed to assistive tech | Medium a11y gap | Every page load | Site-wide | High | Low |
+| 6 | Interactive widget state not announced (`AudioPlayer`, `ClapButton`) | Medium a11y gap for screen-reader users | Every post w/ TTS or clap use | Site-wide pattern | Medium | Low |
+| 7 | Motion not reduced consistently for `prefers-reduced-motion` | Medium comfort/a11y gap | Site-wide (hover lifts, clap pop, live-ping dot) | Site-wide | High | Low |
+
+Items considered and explicitly **not** taken: self-hosting Google Fonts
+(current preconnect + `display=swap` setup is already reasonable; swapping to
+`@fontsource` is a bigger dependency change for marginal gain), keyboard-operable
+image lightbox (real gap, but touching every `.prose img` click handler for a
+decorative zoom feature is disproportionate risk for this pass), and reworking
+color contrast (measured: `--muted` and `--accent` both clear WCAG AA in light
+and dark — no action needed).
+
+## Acceptance criteria
+
+1. **Social share image** — `og:image` / `twitter:image` point to a real raster
+   (PNG) asset that renders correctly when unfurled by platforms that don't
+   support SVG previews. Visual parity with the existing SVG design.
+2. **Skip link** — A visually-hidden-until-focused "Skip to content" link is
+   the first focusable element on every page and moves focus to `<main>`.
+3. **404 page** — Visiting an unknown path renders an on-brand page (matches
+   the design system: eyebrow, display heading, body copy, link home) instead
+   of a bare GitHub Pages error. Confirmed to build to `dist/404.html`.
+4. **NewsletterCTA** — Card styling uses the site's token palette
+   (`--ink`/`--muted`/`--accent`/`--line`/`--surface`) instead of hardcoded
+   brand hex colors and colored glow shadows, while keeping the Substack/LinkedIn
+   iconography legible and the two platform cards visually distinct from each
+   other via layout, not saturated color.
+5. **Active nav state** — The current page's nav link carries
+   `aria-current="page"`.
+6. **Widget state announcements** — `AudioPlayer`'s play/pause button reflects
+   its state via `aria-pressed` and an updated accessible name; status text
+   region is `aria-live="polite"` so screen-reader users hear state changes
+   without needing to poll.
+7. **Reduced motion** — Hover-transform animations, the clap "+1" float, and
+   the newsletter "live" ping dot are skipped or simplified under
+   `prefers-reduced-motion: reduce`, consistent with the existing `.reveal`
+   treatment.
+
+Each item must pass, after implementation: `npm run check` (0 errors),
+`npm run test:unit`, `npm run test:integration`, and `npm run build` — plus a
+manual look at the affected page(s) in the dev server.
+
+## Progress log
+
+- [x] 1. Social share preview image (og:image/twitter:image → PNG) — `og-default.svg`
+      rewritten to use plain SVG `<text>`/`<tspan>` instead of `<foreignObject>`
+      (which several rasterizers, including the `sharp`/librsvg pipeline used to
+      generate the PNG, don't render), then rasterized to `public/og-default.png`
+      via `sharp` (already a transitive dep). `BaseHead.astro` now points
+      `og:image`/`twitter:image` at the PNG and adds `og:image:type/width/height`.
+- [x] 2. Skip-to-content link — added to `BaseLayout.astro` (visually hidden
+      until focused, `.skip-link` in `global.css`), targets `<main
+      id="main-content" tabindex="-1">` so keyboard focus actually lands there
+      (verified with Playwright: Tab → Enter moves `document.activeElement` to
+      `MAIN#main-content`, not just scroll position).
+- [x] 3. Custom 404 page — `src/pages/404.astro`, on-brand (eyebrow/display
+      heading/body/CTA), builds to `dist/404.html` (verified), correctly
+      excluded from the sitemap (`@astrojs/sitemap` excludes `404`/`500` by
+      default — verified in build output), checked in light + dark.
+- [x] 4. NewsletterCTA palette realignment — replaced hardcoded `#FF6719`
+      (Substack) / `#0A66C2` (LinkedIn) badges, borders, glows, and hover
+      colors with the site's own `--accent` token; platform logo marks are now
+      monochrome (`fill-muted`, `group-hover:fill-accent`) like every other
+      icon on the site, matching the "boldness spent in ONE place" principle
+      stated in `global.css`. Verified in light + dark + hover.
+- [x] 5. `aria-current="page"` on active nav link — `Header.astro` now sets it
+      alongside the existing visual `text-ink` vs `text-muted` state, verified
+      in the built `/blog/index.html` output.
+- [x] 6. AudioPlayer state announcements — `aria-pressed` and a dynamic
+      `aria-label` ("Listen to post" / "Pause playback" / "Resume playback")
+      now track play/pause/resume/stop/end/error, and `#tts-status` is
+      `role="status" aria-live="polite"` so state changes are announced
+      without the user needing to move focus. (Full click-through verified by
+      code trace + existing widget-render test; this sandbox's headless
+      Chromium has no speech engine to exercise the real Web Speech API
+      end-to-end, same limitation the feature already had before this change.)
+- [x] 7. `prefers-reduced-motion` coverage for remaining animations — added a
+      single rule in `global.css`'s existing reduced-motion query that cuts
+      all animation/transition durations to ~0 (end states unchanged) rather
+      than chasing every hover-lift/scale/ping/keyframe individually. Verified
+      with Playwright's `reducedMotion: 'reduce'` emulation: home page hero
+      renders fully visible immediately, no broken layout.
+
+## Final regression review
+
+All 7 items landed. Re-ran the full gate from a clean tree as a final pass:
+
+- `npm run check` — 0 errors, 0 warnings (4 pre-existing hints unrelated to
+  this work)
+- `npm run test:unit` — 64/64 passing
+- `npm run test:integration` — 123/123 passing (fresh `astro build`, then
+  Pagefind index generation via `npm run build`)
+- Visual sweep across home/blog post/archive/tags/404 at mobile (390px) and
+  desktop (1440px), light and dark, including hover states on the realigned
+  NewsletterCTA and a `prefers-reduced-motion: reduce` pass — no regressions,
+  no broken layouts, no leftover hardcoded brand colors.
+- `git status` clean, all commits pushed.
+
+No new findings on this pass. PR moved to ready for review.

@@ -57,6 +57,16 @@
   }
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
+    /* Cut every animation/transition to effectively nothing rather than
+       hunting down each hover-lift, scale, ping, and keyframe individually —
+       end states are unchanged, so nothing visually breaks, but users who've
+       asked the OS for reduced motion stop seeing the motion. */
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
   body {
     background-color: var(--paper);
@@ -79,6 +89,27 @@
     outline-offset: 3px;
     border-radius: 2px;
   }
+}
+
+/* Skip-to-content link: off-screen until keyboard-focused, so it never
+   affects sighted mouse users but gives keyboard/screen-reader users a way
+   to bypass the header nav on every page. */
+.skip-link {
+  position: fixed;
+  top: -3rem;
+  left: 1rem;
+  z-index: 100;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 0.6rem 1.1rem;
+  border-radius: 0.4rem;
+  transition: top 0.15s ease;
+}
+.skip-link:focus {
+  top: 1rem;
 }
 
 @layer components {
