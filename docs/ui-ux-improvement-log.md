@@ -72,7 +72,12 @@ manual look at the affected page(s) in the dev server.
 
 ## Progress log
 
-- [ ] 1. Social share preview image (og:image/twitter:image → PNG)
+- [x] 1. Social share preview image (og:image/twitter:image → PNG) — `og-default.svg`
+      rewritten to use plain SVG `<text>`/`<tspan>` instead of `<foreignObject>`
+      (which several rasterizers, including the `sharp`/librsvg pipeline used to
+      generate the PNG, don't render), then rasterized to `public/og-default.png`
+      via `sharp` (already a transitive dep). `BaseHead.astro` now points
+      `og:image`/`twitter:image` at the PNG and adds `og:image:type/width/height`.
 - [ ] 2. Skip-to-content link
 - [ ] 3. Custom 404 page
 - [ ] 4. NewsletterCTA palette realignment
