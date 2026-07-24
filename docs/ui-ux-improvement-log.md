@@ -93,7 +93,9 @@ manual look at the affected page(s) in the dev server.
       monochrome (`fill-muted`, `group-hover:fill-accent`) like every other
       icon on the site, matching the "boldness spent in ONE place" principle
       stated in `global.css`. Verified in light + dark + hover.
-- [ ] 5. `aria-current="page"` on active nav link
+- [x] 5. `aria-current="page"` on active nav link — `Header.astro` now sets it
+      alongside the existing visual `text-ink` vs `text-muted` state, verified
+      in the built `/blog/index.html` output.
 - [ ] 6. AudioPlayer state announcements
 - [ ] 7. `prefers-reduced-motion` coverage for remaining animations
 
