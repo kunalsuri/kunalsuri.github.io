@@ -96,7 +96,14 @@ manual look at the affected page(s) in the dev server.
 - [x] 5. `aria-current="page"` on active nav link — `Header.astro` now sets it
       alongside the existing visual `text-ink` vs `text-muted` state, verified
       in the built `/blog/index.html` output.
-- [ ] 6. AudioPlayer state announcements
+- [x] 6. AudioPlayer state announcements — `aria-pressed` and a dynamic
+      `aria-label` ("Listen to post" / "Pause playback" / "Resume playback")
+      now track play/pause/resume/stop/end/error, and `#tts-status` is
+      `role="status" aria-live="polite"` so state changes are announced
+      without the user needing to move focus. (Full click-through verified by
+      code trace + existing widget-render test; this sandbox's headless
+      Chromium has no speech engine to exercise the real Web Speech API
+      end-to-end, same limitation the feature already had before this change.)
 - [ ] 7. `prefers-reduced-motion` coverage for remaining animations
 
 Entries are checked off with a commit reference as each unit lands, below.
