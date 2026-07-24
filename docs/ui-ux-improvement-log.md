@@ -87,7 +87,12 @@ manual look at the affected page(s) in the dev server.
       heading/body/CTA), builds to `dist/404.html` (verified), correctly
       excluded from the sitemap (`@astrojs/sitemap` excludes `404`/`500` by
       default — verified in build output), checked in light + dark.
-- [ ] 4. NewsletterCTA palette realignment
+- [x] 4. NewsletterCTA palette realignment — replaced hardcoded `#FF6719`
+      (Substack) / `#0A66C2` (LinkedIn) badges, borders, glows, and hover
+      colors with the site's own `--accent` token; platform logo marks are now
+      monochrome (`fill-muted`, `group-hover:fill-accent`) like every other
+      icon on the site, matching the "boldness spent in ONE place" principle
+      stated in `global.css`. Verified in light + dark + hover.
 - [ ] 5. `aria-current="page"` on active nav link
 - [ ] 6. AudioPlayer state announcements
 - [ ] 7. `prefers-reduced-motion` coverage for remaining animations

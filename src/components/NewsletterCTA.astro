@@ -26,24 +26,24 @@ import { NEWSLETTER } from '../consts';
         href={NEWSLETTER.substackUrl}
         target="_blank"
         rel="noopener noreferrer"
-        class="group relative flex flex-col justify-between rounded-xl border border-line bg-canvas p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#FF6719] hover:shadow-md hover:shadow-[#FF6719]/5"
+        class="group relative flex flex-col justify-between rounded-xl border border-line bg-canvas p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-md"
       >
         <div>
           <div class="flex items-center justify-between mb-2">
-            <span class="inline-flex items-center gap-1.5 rounded-md bg-[#FF6719]/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-[#FF6719] uppercase tracking-wider">
+            <span class="inline-flex items-center gap-1.5 rounded-md bg-accent/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-accent uppercase tracking-wider">
               Newsletter
             </span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-muted transition-transform group-hover:translate-x-0.5 group-hover:text-[#FF6719]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-muted transition-transform group-hover:translate-x-0.5 group-hover:text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="7" y1="17" x2="17" y2="7"></line>
               <polyline points="7 7 17 7 17 17"></polyline>
             </svg>
           </div>
           <div class="flex items-center gap-2.5 mt-1">
-            {/* Substack Logo SVG */}
-            <svg class="h-5 w-5 fill-[#FF6719] shrink-0" viewBox="0 0 24 24" role="img" aria-label="Substack">
+            {/* Substack Logo SVG — kept monochrome to match the site's restrained mark treatment. */}
+            <svg class="h-5 w-5 fill-muted shrink-0 transition-colors group-hover:fill-accent" viewBox="0 0 24 24" role="img" aria-label="Substack">
               <path d="M22.539 8.242H1.46V5.406h21.08v2.836zM1.46 10.812V24L12 18.11 22.54 24V10.812H1.46zM22.54 0H1.46v2.836h21.08V0z"/>
             </svg>
-            <span class="font-display font-bold text-ink group-hover:text-[#FF6719] transition-colors">
+            <span class="font-display font-bold text-ink group-hover:text-accent transition-colors">
               Substack
             </span>
           </div>
@@ -51,7 +51,7 @@ import { NEWSLETTER } from '../consts';
             Long-form essays, deep dives &amp; newsletter issues.
           </p>
         </div>
-        <div class="mt-4 pt-2 border-t border-line/50 flex items-center gap-1 font-mono text-xs font-semibold text-ink group-hover:text-[#FF6719]">
+        <div class="mt-4 pt-2 border-t border-line/50 flex items-center gap-1 font-mono text-xs font-semibold text-ink group-hover:text-accent">
           <span>Follow @kunalsuri &rarr;</span>
         </div>
       </a>
@@ -61,24 +61,24 @@ import { NEWSLETTER } from '../consts';
         href={NEWSLETTER.linkedinUrl}
         target="_blank"
         rel="noopener noreferrer"
-        class="group relative flex flex-col justify-between rounded-xl border border-line bg-canvas p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-[#0A66C2] hover:shadow-md hover:shadow-[#0A66C2]/5"
+        class="group relative flex flex-col justify-between rounded-xl border border-line bg-canvas p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-accent hover:shadow-md"
       >
         <div>
           <div class="flex items-center justify-between mb-2">
-            <span class="inline-flex items-center gap-1.5 rounded-md bg-[#0A66C2]/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-[#0A66C2] uppercase tracking-wider">
+            <span class="inline-flex items-center gap-1.5 rounded-md bg-accent/10 px-2 py-0.5 font-mono text-[10px] font-semibold text-accent uppercase tracking-wider">
               Network
             </span>
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-muted transition-transform group-hover:translate-x-0.5 group-hover:text-[#0A66C2]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-muted transition-transform group-hover:translate-x-0.5 group-hover:text-accent" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="7" y1="17" x2="17" y2="7"></line>
               <polyline points="7 7 17 7 17 17"></polyline>
             </svg>
           </div>
           <div class="flex items-center gap-2.5 mt-1">
-            {/* LinkedIn Logo SVG */}
-            <svg class="h-5 w-5 fill-[#0A66C2] shrink-0" viewBox="0 0 24 24" role="img" aria-label="LinkedIn">
+            {/* LinkedIn Logo SVG — kept monochrome to match the site's restrained mark treatment. */}
+            <svg class="h-5 w-5 fill-muted shrink-0 transition-colors group-hover:fill-accent" viewBox="0 0 24 24" role="img" aria-label="LinkedIn">
               <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
             </svg>
-            <span class="font-display font-bold text-ink group-hover:text-[#0A66C2] transition-colors">
+            <span class="font-display font-bold text-ink group-hover:text-accent transition-colors">
               LinkedIn
             </span>
           </div>
@@ -86,7 +86,7 @@ import { NEWSLETTER } from '../consts';
             Short engineering notes, thoughts &amp; tech posts.
           </p>
         </div>
-        <div class="mt-4 pt-2 border-t border-line/50 flex items-center gap-1 font-mono text-xs font-semibold text-ink group-hover:text-[#0A66C2]">
+        <div class="mt-4 pt-2 border-t border-line/50 flex items-center gap-1 font-mono text-xs font-semibold text-ink group-hover:text-accent">
           <span>Connect / kunalsuri &rarr;</span>
         </div>
       </a>
