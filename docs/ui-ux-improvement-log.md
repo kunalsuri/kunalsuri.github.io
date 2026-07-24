@@ -111,4 +111,19 @@ manual look at the affected page(s) in the dev server.
       with Playwright's `reducedMotion: 'reduce'` emulation: home page hero
       renders fully visible immediately, no broken layout.
 
-Entries are checked off with a commit reference as each unit lands, below.
+## Final regression review
+
+All 7 items landed. Re-ran the full gate from a clean tree as a final pass:
+
+- `npm run check` — 0 errors, 0 warnings (4 pre-existing hints unrelated to
+  this work)
+- `npm run test:unit` — 64/64 passing
+- `npm run test:integration` — 123/123 passing (fresh `astro build`, then
+  Pagefind index generation via `npm run build`)
+- Visual sweep across home/blog post/archive/tags/404 at mobile (390px) and
+  desktop (1440px), light and dark, including hover states on the realigned
+  NewsletterCTA and a `prefers-reduced-motion: reduce` pass — no regressions,
+  no broken layouts, no leftover hardcoded brand colors.
+- `git status` clean, all commits pushed.
+
+No new findings on this pass. PR moved to ready for review.
