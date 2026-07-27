@@ -10,9 +10,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Standard `CHANGELOG.md` file to track release history and synchronize future software releases.
 - AI discoverability feed endpoints (`/llms.txt`, `/llms-full.txt`) and Studio CMS environment references across core documentation.
+- `.agents/AGENTS.md` workspace customization rules file following Anti-gravity guidelines and AGENTS.md open standard.
 
 ### Changed
-- Synchronized `AGENTS.md` and `CLAUDE.md` as exact instruction mirrors following the open AGENTS.md standard.
+- Synchronized `AGENTS.md`, `CLAUDE.md`, and `.agents/AGENTS.md` as exact instruction mirrors incorporating latest AI and Anti-gravity web development best practices.
 - Updated `README.md` and `scripts/README.md` to detail full test architecture (6 unit and 7 integration test suites), Studio CMS integration, and security policy navigation links.
 
 ### Deprecated

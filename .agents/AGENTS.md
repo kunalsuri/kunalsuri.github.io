@@ -1,7 +1,7 @@
-# CLAUDE.md
+# AGENTS.md
 
-> Persistent instructions for Claude Code sessions on this repository.
-> Follows the open [AGENTS.md](https://agents.md) standard. Exact mirror of [AGENTS.md](AGENTS.md) and [.agents/AGENTS.md](.agents/AGENTS.md).
+> Project instructions for AI agents and Anti-gravity sessions on this repository.
+> Follows the open [AGENTS.md](https://agents.md) standard. Exact mirror of root [AGENTS.md](../AGENTS.md) and [CLAUDE.md](../CLAUDE.md).
 
 ## Project Overview
 
@@ -54,10 +54,10 @@ The `postbuild` script runs Pagefind automatically (`pagefind --site dist`) to g
 ├── tsconfig.json            # Extends astro/tsconfigs/strict, JSX → Preact
 ├── vitest.config.ts         # Vitest test configuration
 ├── package.json             # Scripts, deps (Astro 7, Preact, Tailwind v4, Pagefind, Vitest)
-├── AGENTS.md                # Agent instructions (mirrored with CLAUDE.md & .agents/AGENTS.md)
+├── AGENTS.md                # Agent instructions (mirrored with CLAUDE.md)
 ├── CLAUDE.md                # Claude Code instructions (mirrored with AGENTS.md)
 ├── .agents/                 # Workspace customizations root
-│   └── AGENTS.md            # Anti-gravity workspace agent instructions
+│   └── AGENTS.md            # Mirror of AGENTS.md rules for Anti-gravity workspace root
 ├── CHANGELOG.md             # Keep a Changelog release notes
 ├── SECURITY.md              # Security vulnerability reporting & automated tooling policies
 ├── src/

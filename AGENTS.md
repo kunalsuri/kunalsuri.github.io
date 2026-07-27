@@ -1,7 +1,7 @@
 # AGENTS.md
 
 > A README for AI coding agents — context and rules for working on this repository.
-> Follows the open [AGENTS.md](https://agents.md) standard. Exact mirror of [CLAUDE.md](CLAUDE.md).
+> Follows the open [AGENTS.md](https://agents.md) standard. Exact mirror of [CLAUDE.md](CLAUDE.md) and [.agents/AGENTS.md](.agents/AGENTS.md).
 
 ## Project Overview
 
@@ -50,12 +50,14 @@ The `postbuild` script runs Pagefind automatically (`pagefind --site dist`) to g
 
 ```
 ├── astro.config.mjs        # Astro config — site URL, integrations (MDX, Sitemap, Preact), Tailwind v4 Vite plugin, Studio plugin
-├── studio-server-plugin.mjs # Dev-only Vite plugin for Studio local backend (posts CRUD, asset serving, image search)
+├── studio-server-plugin.mjs # Dev-only Vite plugin for Studio local backend (posts CRUD, asset serving, image search, link unfurl)
 ├── tsconfig.json            # Extends astro/tsconfigs/strict, JSX → Preact
 ├── vitest.config.ts         # Vitest test configuration
 ├── package.json             # Scripts, deps (Astro 7, Preact, Tailwind v4, Pagefind, Vitest)
-├── AGENTS.md                # Agent instructions (mirrored with CLAUDE.md)
+├── AGENTS.md                # Agent instructions (mirrored with CLAUDE.md & .agents/AGENTS.md)
 ├── CLAUDE.md                # Claude Code instructions (mirrored with AGENTS.md)
+├── .agents/                 # Workspace customizations root
+│   └── AGENTS.md            # Anti-gravity workspace agent instructions
 ├── CHANGELOG.md             # Keep a Changelog release notes
 ├── SECURITY.md              # Security vulnerability reporting & automated tooling policies
 ├── src/
@@ -65,11 +67,11 @@ The `postbuild` script runs Pagefind automatically (`pagefind --site dist`) to g
 │   ├── layouts/             # BaseLayout.astro (site chrome), BlogPost.astro (post wrapper)
 │   ├── pages/               # Routes: index, about, archive, search, rss.xml.js, llms.txt.ts, llms-full.txt.ts, blog/, tags/, categories/, studio/, api/
 │   ├── styles/global.css    # Tailwind CSS v4 config (CSS-first, no tailwind.config.js)
-│   ├── utils/               # posts.ts (query helpers), reading-time.ts, taxonomy.ts (tag/category extraction)
-│   └── content/blog/        # Blog posts as .md / .mdx — filename = URL slug
+│   ├── utils/               # posts.ts (query helpers), reading-time.ts, taxonomy.ts (tag/category extraction), studio-fs.ts
+│   └── content/blog/        # Blog posts as .md / .mdx — filename or folder/index.md = URL slug
 ├── tests/                   # Vitest test suite
-│   ├── unit/                # Unit tests: consts, markdown-preview, reading-time, studio-fs, studio, taxonomy
-│   └── integration/         # Integration tests: ai-discoverability, blog-posts, build, content-schema, reader-experience, rss
+│   ├── unit/                # Unit tests: consts, markdown-preview, reading-time, studio-fs, studio, taxonomy (6 test suites)
+│   └── integration/         # Integration tests: ai-discoverability, blog-posts, build, content-schema, ensure-build, reader-experience, rss (7 test suites)
 ├── scripts/                 # Token-efficient Windows & Linux dev scripts
 ├── public/                  # Static assets (favicon.svg)
 ├── .github/workflows/       # ci.yml, codeql-analysis.yml, deploy.yml
@@ -77,11 +79,12 @@ The `postbuild` script runs Pagefind automatically (`pagefind --site dist`) to g
 └── CONTENT_LICENSE          # CC BY 4.0 (blog content)
 ```
 
-## Code Style & Rules
+## Code Style & AI Web Development Rules
 
 - **TypeScript strict mode** — do not add `@ts-ignore` or `any` without justification.
-- **Astro components** (`.astro`) for all UI. Use Preact (`.tsx`) only when client-side interactivity is required.
+- **Astro components** (`.astro`) for static UI. Use Preact (`.tsx`) islands only when client-side interactivity is required.
 - **Tailwind CSS v4** — configured as a Vite plugin. All theme config lives in `src/styles/global.css`. There is **no** `tailwind.config.js`.
+- **Modern Web Aesthetics** — prioritize visual excellence, smooth transitions, responsive layouts, clear color contrast, dark mode compatibility, and clean typography (Inter / System font stack).
 - **Named exports** preferred. Default exports only where required by framework conventions.
 - **Relative imports** within `src/`. No path aliases are configured.
 - Keep components small, focused, and reusable. Do not create "god components."
@@ -100,7 +103,7 @@ Optional fields: `updatedDate` (date), `category` (string, default "Notes"), `ta
 
 The Zod schema is defined in `src/content.config.ts`. Any new frontmatter field **must** be added there.
 
-Filename maps to URL slug: `my-post.md` → `/blog/my-post/`.
+Slug resolution supports both flat files (`my-post.md` → `/blog/my-post/`) and folder index files (`my-post/index.md` → `/blog/my-post/`).
 
 ## Testing & Verification (Token-Efficient Checklist)
 
@@ -137,8 +140,8 @@ If UI was changed, visually verify with `npm run dev`.
 
 ## Special Features & Workflow Notes
 
-- **Claude / Agents Mirroring**: `CLAUDE.md` and `AGENTS.md` are exact content mirrors and must be kept updated in lockstep.
+- **Claude / Anti-gravity / AGENTS Mirroring**: `CLAUDE.md`, `AGENTS.md`, and `.agents/AGENTS.md` are exact content mirrors and must be kept updated in lockstep.
 - **AI Discoverability**: `/llms.txt` and `/llms-full.txt` provide LLM-friendly documentation feeds.
-- **Studio CMS Environment**: Local interactive post management available at `/studio` in dev mode (`npm run dev`), powered by `studio-server-plugin.mjs`.
+- **Studio CMS Environment**: Local interactive post management available at `/studio` in dev mode (`npm run dev`), powered by `studio-server-plugin.mjs` middleware (supporting post CRUD, image search/upload, link unfurling, and WebSocket HMR reload suppression for post editing).
 - **Giscus Comments**: Pre-wired in `src/consts.ts` and `src/components/Comments.astro` (requires `categoryId` when activated).
 - **RSS & Sitemap**: RSS feed at `/rss.xml`; sitemap at `/sitemap-index.xml`.
