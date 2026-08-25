@@ -203,7 +203,6 @@ export function useStudioPosts() {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (saveStatus !== 'saved') {
         e.preventDefault();
-        e.returnValue = '';
       }
     };
     window.addEventListener('beforeunload', handleBeforeUnload);

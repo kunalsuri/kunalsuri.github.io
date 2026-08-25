@@ -74,7 +74,7 @@ The `postbuild` script runs Pagefind automatically (`pagefind --site dist`) to g
 │   └── integration/         # Integration tests: ai-discoverability, blog-posts, build, content-schema, ensure-build, reader-experience, rss (7 test suites)
 ├── scripts/                 # Token-efficient Windows & Linux dev scripts
 ├── public/                  # Static assets (favicon.svg)
-├── .github/workflows/       # ci.yml, codeql-analysis.yml, deploy.yml
+├── .github/                 # dependabot.yml (weekly updates) & workflows/ (ci.yml, codeql-analysis.yml, deploy.yml, dependabot-automerge.yml)
 ├── LICENSE                  # Apache 2.0 (source code)
 └── CONTENT_LICENSE          # CC BY 4.0 (blog content)
 ```

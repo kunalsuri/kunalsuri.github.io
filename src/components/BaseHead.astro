@@ -108,6 +108,7 @@ const jsonLd = article
 {
   ANALYTICS.cloudflareToken && (
     <script
+      is:inline
       defer
       src="https://static.cloudflareinsights.com/beacon.min.js"
       data-cf-beacon={`{"token": "${ANALYTICS.cloudflareToken}"}`}
@@ -117,6 +118,7 @@ const jsonLd = article
 {
   ANALYTICS.goatcounterCode && (
     <script
+      is:inline
       data-goatcounter={`https://${ANALYTICS.goatcounterCode}.goatcounter.com/count`}
       async
       src="//gc.zgo.at/count.js"

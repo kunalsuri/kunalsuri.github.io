@@ -7,7 +7,6 @@ import {
   saveStudioPost,
   saveStudioImage,
   deleteStudioPost,
-  sanitizeSlug,
 } from '../../src/utils/studio-fs.ts';
 
 const TEST_SLUG = 'test-folder-post-1234';
