@@ -5,6 +5,8 @@ pubDate: 2026-07-12
 updatedDate: 2026-07-13
 category: "Engineering"
 tags: ["web", "guide"]
+series: "What Is"
+seriesOrder: 1
 draft: false
 ---
 
@@ -21,6 +23,12 @@ This is a template file demonstrating how markdown files should be structured an
 | `category` | string | No | The primary section category (e.g., Engineering, Notes). Defaults to `Notes`. |
 | `tags` | string[] | No | Array of tags representing topics. Defaults to `[]`. |
 | `draft` | boolean | No | Set to `true` to hide the post from production builds. Defaults to `false`. |
+| `series` | string | No | Display name of the series this post belongs to (e.g. `"What Is"`). Omit for standalone posts. |
+| `seriesOrder` | integer ≥ 1 | No | Explicit position within the series. Omit to order by `pubDate`. |
+
+> **`category` is not `series`.** `category` is the section a post is filed under (Engineering, Notes …); `series` is the multi-post thread it belongs to. A post can have both — a "What Is" post is still filed under Engineering. Setting `category: "What Is"` is a mistake the verification script warns about.
+>
+> Declaring `series` is all that is needed: `/series` and `/series/<slug>` build themselves, and the post gets in-article series navigation. See `docs/series/what-is-playbook.md`.
 
 ---
 

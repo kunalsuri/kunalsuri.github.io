@@ -24,9 +24,32 @@ export const SOCIAL = {
 
 export const NAV_LINKS = [
   { href: '/blog', label: 'Writing' },
+  { href: '/series', label: 'Series' },
   { href: '/archive', label: 'Archive' },
   { href: '/about', label: 'About' },
 ];
+
+/*
+  Editorial copy for each series, keyed by the slugified `series` front-matter
+  value ("What Is" -> "what-is"). Purely optional: a series with no entry here
+  still gets its own page, just without a blurb. Add an entry when a series
+  earns a standing description.
+*/
+export interface SeriesMeta {
+  /** Shown under the heading on /series and /series/[slug]. */
+  description: string;
+  /** One line on who the series is for and what it promises. */
+  promise?: string;
+}
+
+export const SERIES_META: Record<string, SeriesMeta> = {
+  'what-is': {
+    description:
+      'Short, plain-language explainers of the terms that get used far more often than they get defined.',
+    promise:
+      'One idea per post, explained the way I would want it explained to me: what it is, why it exists, where it breaks, and what it is not.',
+  },
+};
 
 /*
   giscus comments (GitHub Discussions-backed).

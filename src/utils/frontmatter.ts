@@ -13,6 +13,10 @@ export interface BlogFrontmatter {
   category: string;
   tags: string[];
   draft: boolean;
+  /** Series display name, e.g. "What Is". Absent for standalone posts. */
+  series?: string;
+  /** Explicit reading-order position within the series. */
+  seriesOrder?: number;
 }
 
 export interface ParsedMarkdown {
@@ -48,6 +52,17 @@ function asString(value: unknown, fallback: string): string {
 /** js-yaml's JSON_SCHEMA never auto-resolves dates, but stays defensive in
  * case a value ever arrives as a real Date (e.g. hand-edited under a
  * different schema elsewhere). */
+/** Series order is a positive integer or nothing — a 0, a float, or a
+ * non-numeric string is dropped rather than written back out as invalid
+ * front-matter that would fail the Astro build. */
+function asSeriesOrder(value: unknown): number | undefined {
+  const parsed = typeof value === 'string' ? Number(value.trim()) : value;
+  if (typeof parsed !== 'number' || !Number.isInteger(parsed) || parsed < 1) {
+    return undefined;
+  }
+  return parsed;
+}
+
 function asDate(value: unknown): string | undefined {
   if (typeof value === 'string' && value.trim()) return value.trim();
   if (value instanceof Date) return value.toISOString().split('T')[0];
@@ -101,6 +116,17 @@ export function parseFrontmatter(fileContent: string): ParsedMarkdown {
     frontmatter.updatedDate = updatedDate;
   }
 
+  const series = typeof record.series === 'string' ? record.series.trim() : '';
+  if (series) {
+    frontmatter.series = series;
+    const seriesOrder = asSeriesOrder(record.seriesOrder);
+    // seriesOrder without a series is meaningless, so it only survives
+    // alongside one.
+    if (seriesOrder !== undefined) {
+      frontmatter.seriesOrder = seriesOrder;
+    }
+  }
+
   return { frontmatter, content: body || '' };
 }
 
@@ -119,6 +145,15 @@ export function stringifyFrontmatter(frontmatter: Partial<BlogFrontmatter>, cont
   record.category = frontmatter.category || 'Notes';
   record.tags = Array.isArray(frontmatter.tags) ? frontmatter.tags : [];
   record.draft = Boolean(frontmatter.draft);
+
+  const series = typeof frontmatter.series === 'string' ? frontmatter.series.trim() : '';
+  if (series) {
+    record.series = series;
+    const seriesOrder = asSeriesOrder(frontmatter.seriesOrder);
+    if (seriesOrder !== undefined) {
+      record.seriesOrder = seriesOrder;
+    }
+  }
 
   const yaml = dump(record, {
     sortKeys: false, // preserve insertion order above (title, description, pubDate, ...)

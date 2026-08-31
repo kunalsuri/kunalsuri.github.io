@@ -39,6 +39,8 @@ npm run check        # Run astro check (type-checking)
 npm run test         # Run full Vitest test suite
 npm run test:unit    # Fast unit tests only (tests/unit)
 npm run test:integration # Integration tests only (tests/integration)
+npm run verify:post -- <slug>  # Mechanical pre-publish gate for one post
+npm run verify:posts     # Same gate across every post
 npm run build        # Production build to dist/
 npm run dev          # Start dev server at http://localhost:4321
 npm run preview      # Preview the built site locally
@@ -63,16 +65,19 @@ The `postbuild` script runs Pagefind automatically (`pagefind --site dist`) to g
 ├── src/
 │   ├── consts.ts            # Site-wide constants: SITE_TITLE, SITE_URL, AUTHOR, SOCIAL, NAV_LINKS, GISCUS
 │   ├── content.config.ts    # Content Layer schema (Zod): title, description, pubDate, category, tags, draft
-│   ├── components/          # Astro & Preact components: BaseHead, Header, Footer, PostCard, ThemeToggle, Comments, studio/
+│   ├── components/          # Astro & Preact components: BaseHead, Header, Footer, PostCard, SeriesNav, ThemeToggle, Comments, studio/
 │   ├── layouts/             # BaseLayout.astro (site chrome), BlogPost.astro (post wrapper)
-│   ├── pages/               # Routes: index, about, archive, search, rss.xml.js, llms.txt.ts, llms-full.txt.ts, blog/, tags/, categories/, studio/, api/
+│   ├── pages/               # Routes: index, about, archive, search, rss.xml.js, llms.txt.ts, llms-full.txt.ts, blog/, tags/, categories/, series/, studio/, api/
 │   ├── styles/global.css    # Tailwind CSS v4 config (CSS-first, no tailwind.config.js)
-│   ├── utils/               # posts.ts (query helpers), reading-time.ts, taxonomy.ts (tag/category extraction), studio-fs.ts
+│   ├── utils/               # posts.ts (query helpers), reading-time.ts, taxonomy.ts (tag/category extraction), series.ts (series ordering & context), studio-fs.ts
 │   └── content/blog/        # Blog posts as .md / .mdx — filename or folder/index.md = URL slug
 ├── tests/                   # Vitest test suite
-│   ├── unit/                # Unit tests: consts, markdown-preview, reading-time, studio-fs, studio, taxonomy (6 test suites)
-│   └── integration/         # Integration tests: ai-discoverability, blog-posts, build, content-schema, ensure-build, reader-experience, rss (7 test suites)
+│   ├── unit/                # Unit tests: consts, markdown-preview, reading-time, series, studio-fs, studio, taxonomy, verify-post (8 test suites)
+│   └── integration/         # Integration tests: ai-discoverability, blog-posts, build, content-schema, ensure-build, reader-experience, rss, series (8 test suites)
+├── docs/series/             # "What Is" series playbook, idea backlog, and per-post verification reports
+├── .claude/skills/what-is/  # The one series skill (mirrored to .agents/skills/)
 ├── scripts/                 # Token-efficient Windows & Linux dev scripts
+│   └── verify-post.mjs      # Mechanical pre-publish gate for blog posts (npm run verify:post)
 ├── public/                  # Static assets (favicon.svg)
 ├── .github/                 # dependabot.yml (weekly updates) & workflows/ (ci.yml, codeql-analysis.yml, deploy.yml, dependabot-automerge.yml)
 ├── LICENSE                  # Apache 2.0 (source code)
@@ -99,7 +104,11 @@ description: "SEO summary."
 pubDate: 2026-07-09
 ```
 
-Optional fields: `updatedDate` (date), `category` (string, default "Notes"), `tags` (string[], default []), `draft` (boolean, default false).
+Optional fields: `updatedDate` (date), `category` (string, default "Notes"), `tags` (string[], default []), `draft` (boolean, default false), `series` (string), `seriesOrder` (positive integer).
+
+**`category` vs `series`** — they are orthogonal and must not be collapsed. `category` is the *section* a post is filed under (Engineering, Notes …); `series` is the *thread* it belongs to ("What Is"). A post can be both. Never set `category: "What Is"`.
+
+`seriesOrder` is optional: omit it and posts sort by `pubDate` within the series. Set it only when reading order must differ from publication order.
 
 The Zod schema is defined in `src/content.config.ts`. Any new frontmatter field **must** be added there.
 
@@ -114,13 +123,49 @@ Before marking work complete, agents **must** run the consolidated verification 
 
 This script executes all 4 required gates in one pass:
 1. `npm run check` — type check (zero errors)
-2. `npm run test:unit` — unit tests (6 test suites)
-3. `npm run test:integration` — integration tests (7 test suites)
+2. `npm run test:unit` — unit tests (8 test suites)
+3. `npm run test:integration` — integration tests (8 test suites)
 4. `npm run build` — production build (+ Pagefind index)
+
+For blog content specifically, also run `npm run verify:post -- <slug>` — the mechanical publish gate (schema shape, house-style structure, length, leftover placeholders). It runs inside `tests/integration/series.test.ts` too, so a malformed post fails CI.
 
 > **Debugging Note:** For fast targeted iteration during local debugging, agents may run `npm run test:unit` or `npm run check` individually.
 
 If UI was changed, visually verify with `npm run dev`.
+
+## Post Series & the Draft → Verify → Publish Pipeline
+
+A **series** is an ordered run of posts sharing a spine. Declaring `series: "<Name>"` in front-matter is all it takes: `/series` and `/series/<slug>` build themselves, the post gets in-article series navigation, and the series appears in `/llms.txt` in reading order. Add a blurb for a series by adding an entry to `SERIES_META` in `src/consts.ts`. No route or component work is needed to start a new series.
+
+Series posts sort **oldest-first** (reading order), unlike every other listing on the site, which is newest-first.
+
+### The "What Is …" series
+
+`docs/series/what-is-playbook.md` holds the house style; `.claude/skills/what-is/SKILL.md` holds the workflow; `scripts/verify-post.mjs` holds the mechanical gate. Each fact lives in exactly one of those three — change style in the playbook, not in the copies.
+
+**There is one command.** `/what-is <topic-or-slug>` works out what to do by looking at the disk, so nothing tracks pipeline state in a second place and nothing can drift:
+
+| Stage on disk | What `/what-is` does |
+|---|---|
+| no post file | Drafts it, `draft: true`, uncertain claims marked `[?]` |
+| `draft: true`, no review file | Fact-checks it against primary sources, writes `docs/series/reviews/<slug>.md` |
+| `draft: true`, review file exists | Publishes — but only once you say go |
+| `draft: false` | Nothing; says so |
+
+`/what-is` with no argument reports every series post's stage. `npm run verify:post -- --stage` does the same without an agent.
+
+The skill sets `disable-model-invocation: true`, so Claude can never run it unprompted — it can only suggest that you do. That is what makes the human review turn a mechanical guarantee rather than an instruction an agent might talk itself out of.
+
+Rules that agents **must** honour:
+
+- **Never draft and publish in the same turn.** The human review turn is the point of the pipeline.
+- **Never ship a factual claim that was not checked against a current primary source this session.** Definitions assembled from memory are the exact failure this series exists to avoid.
+- **`[?]` markers block publishing.** `scripts/verify-post.mjs` treats them as hard errors. Resolve them; never strip them to pass the gate.
+- **There is no minimum length.** A term explained clearly in 300 words is the series working. Only a soft ~1200-word ceiling warns.
+- **Drafts live in `src/content/blog/` with `draft: true`**, not in `docs/drafts/`. Drafts are hidden from production builds but visible in `npm run dev`, so a post is reviewed exactly as it will look.
+- Publishing requires an existing `docs/series/reviews/<slug>.md`.
+
+`docs/series/what-is-backlog.md` is ideas only — no status tables, because the posts on disk already carry that.
 
 ## Deployment & CI/CD
 

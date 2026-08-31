@@ -15,6 +15,8 @@ const blogSchema = z.object({
   category: z.string().default('Notes'),
   tags: z.array(z.string()).default([]),
   draft: z.boolean().default(false),
+  series: z.string().optional(),
+  seriesOrder: z.number().int().positive().optional(),
 });
 
 describe('Blog content schema', () => {
@@ -171,6 +173,80 @@ describe('Blog content schema', () => {
         description: 'Draft should be boolean.',
         pubDate: '2026-01-01',
         draft: 'yes',
+      });
+      expect(result.success).toBe(false);
+    });
+  });
+
+  describe('series fields', () => {
+    it('accepts a post with no series (the common case)', () => {
+      const result = blogSchema.safeParse({
+        title: 'Standalone',
+        description: 'Not part of a series.',
+        pubDate: '2026-01-01',
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.series).toBeUndefined();
+        expect(result.data.seriesOrder).toBeUndefined();
+      }
+    });
+
+    it('accepts a series with an explicit order', () => {
+      const result = blogSchema.safeParse({
+        title: 'What is an LLM?',
+        description: 'An explainer.',
+        pubDate: '2026-01-01',
+        series: 'What Is',
+        seriesOrder: 3,
+      });
+      expect(result.success).toBe(true);
+      if (result.success) {
+        expect(result.data.series).toBe('What Is');
+        expect(result.data.seriesOrder).toBe(3);
+      }
+    });
+
+    it('accepts a series without an order (falls back to pubDate ordering)', () => {
+      const result = blogSchema.safeParse({
+        title: 'What is a token?',
+        description: 'An explainer.',
+        pubDate: '2026-01-01',
+        series: 'What Is',
+      });
+      expect(result.success).toBe(true);
+    });
+
+    it('rejects a non-string series', () => {
+      const result = blogSchema.safeParse({
+        title: 'Bad Series',
+        description: 'Series should be a string.',
+        pubDate: '2026-01-01',
+        series: 42,
+      });
+      expect(result.success).toBe(false);
+    });
+
+    it('rejects a zero or negative seriesOrder', () => {
+      for (const seriesOrder of [0, -1]) {
+        const result = blogSchema.safeParse({
+          title: 'Bad Order',
+          description: 'Order must be positive.',
+          pubDate: '2026-01-01',
+          series: 'What Is',
+          seriesOrder,
+        });
+        expect(result.success).toBe(false);
+      }
+    });
+
+    it('rejects a fractional seriesOrder', () => {
+      const result = blogSchema.safeParse({
+        title: 'Bad Order',
+        description: 'Order must be an integer.',
+        pubDate: '2026-01-01',
+        series: 'What Is',
+        seriesOrder: 1.5,
       });
       expect(result.success).toBe(false);
     });

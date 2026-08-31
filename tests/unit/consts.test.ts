@@ -1,4 +1,6 @@
 import { describe, it, expect } from 'vitest';
+import fsSync from 'node:fs';
+import { resolve as pathResolve } from 'node:path';
 import {
   SITE_TITLE,
   SITE_DESCRIPTION,
@@ -123,5 +125,48 @@ describe('isCommentsConfigured', () => {
     if (GISCUS.categoryId === '') {
       expect(isCommentsConfigured()).toBe(false);
     }
+  });
+});
+
+/**
+ * Regression guard for tests/integration/ensure-build.ts.
+ *
+ * Vitest exports its Vite environment into process.env (MODE=test, DEV=1,
+ * PROD= empty, SSR=1, ...). A child `astro build` inherits them, Vite honours
+ * them over its own defaults, and `import.meta.env.PROD` comes out false — so
+ * draft posts get built and every integration assertion runs against a bundle
+ * that is not the deployed one. It fails silently, which is why it went
+ * unnoticed until the repo gained its first draft.
+ */
+describe('integration build environment', () => {
+  const REQUIRED_STRIPPED = [
+    'NODE_ENV',
+    'MODE',
+    'DEV',
+    'PROD',
+    'SSR',
+    'BASE_URL',
+    'TEST',
+    'VITEST',
+  ];
+
+  it('strips every Vite/Vitest variable that would leak into astro build', () => {
+    const source = fsSync.readFileSync(
+      pathResolve('tests/integration/ensure-build.ts'),
+      'utf-8',
+    );
+    for (const key of REQUIRED_STRIPPED) {
+      expect(source, `ensure-build.ts must delete ${key} from the build env`).toContain(
+        `'${key}'`,
+      );
+    }
+  });
+
+  it('keeps the build lock outside dist/, which astro build empties', () => {
+    const source = fsSync.readFileSync(
+      pathResolve('tests/integration/ensure-build.ts'),
+      'utf-8',
+    );
+    expect(source).not.toMatch(/LOCK_FILE\s*=\s*path\.join\(\s*DIST_DIR/);
   });
 });

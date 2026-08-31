@@ -2,6 +2,8 @@
 import { getCollection, render } from 'astro:content';
 import BlogPost from '../../layouts/BlogPost.astro';
 import { readingTime } from '../../utils/reading-time';
+import { getSeriesContext } from '../../utils/series';
+import { slugify } from '../../utils/taxonomy';
 
 // Astro is a static site generator: getStaticPaths() runs at BUILD time and
 // tells Astro every URL to pre-render. One HTML file per post, zero server.
@@ -22,6 +24,7 @@ export async function getStaticPaths() {
 
     const currentCategory = post.data.category;
     const currentTags = post.data.tags || [];
+    const currentSeries = post.data.series ? slugify(post.data.series) : undefined;
 
     const relatedPosts = posts
       .filter((p) => p.id !== post.id)
@@ -31,6 +34,12 @@ export async function getStaticPaths() {
         if (p.data.tags) {
           const common = p.data.tags.filter((t) => currentTags.includes(t));
           score += common.length * 2;
+        }
+        // Siblings in the same series already have their own dedicated nav
+        // box, so they are deliberately *not* boosted here — "Related" is for
+        // reaching outside the series, not repeating it.
+        if (currentSeries && p.data.series && slugify(p.data.series) === currentSeries) {
+          score -= 5;
         }
         return { post: p, score };
       })
@@ -54,6 +63,7 @@ export async function getStaticPaths() {
 
 const { post, prevPost, nextPost, relatedPosts } = Astro.props;
 const { Content, headings } = await render(post);
+const seriesContext = await getSeriesContext(post.id);
 ---
 
 <BlogPost
@@ -63,6 +73,7 @@ const { Content, headings } = await render(post);
   prevPost={prevPost}
   nextPost={nextPost}
   relatedPosts={relatedPosts}
+  seriesContext={seriesContext}
 >
   <Content />
 </BlogPost>
