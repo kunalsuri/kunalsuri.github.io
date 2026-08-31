@@ -1,9 +1,8 @@
 # The "What Is …" Playbook
 
 > The single source of truth for how a **What Is** post gets written, checked, and
-> shipped. The Claude Code skill (`.claude/skills/what-is-post/`), the slash
-> commands, and the `verify:post` script all defer to this file. Change the
-> house style here, not in three places.
+> shipped. The Agent Skills in `.claude/skills/` and the `verify:post` script all
+> defer to this file. Change the house style here, not in three places.
 
 ## 1. What the series is
 
@@ -156,17 +155,33 @@ one boolean flips.
 `docs/drafts/` remains for imported or half-abandoned pieces that are not yet
 shaped like posts.
 
-## 8. Working with Antigravity
+## 8. How the pipeline is built, and working with Antigravity
 
-Antigravity, Claude Code, and any other agent read the same instructions:
-`AGENTS.md` / `CLAUDE.md` / `.agents/AGENTS.md` are exact mirrors, and both
-`.claude/skills/what-is-post/` and `.agents/skills/what-is-post/` carry the same
-skill. So you can draft in one tool, verify in another, and save from
-Antigravity without the house style drifting.
+The pipeline is five **Agent Skills** in `.claude/skills/`, mirrored to
+`.agents/skills/`. Anthropic merged custom slash commands into skills, so skills
+are the supported format; a skill's directory name is the command you type.
 
-The commands are Claude Code slash commands. In Antigravity, open this playbook
-and follow §3–§6 directly, or run `npm run verify:post -- <slug>` from its
-terminal — the mechanical gate is a plain Node script with no agent in the loop.
+| Skill | Invoked by | Why |
+|---|---|---|
+| `what-is-post` | Claude, automatically | House style. Loads whenever you work on a series post. |
+| `what-is-draft` | You only | Creates files. `disable-model-invocation: true` |
+| `what-is-verify` | You only | The review turn is yours to start. `disable-model-invocation: true` |
+| `what-is-publish` | You only | Publishing is never something Claude decides. `disable-model-invocation: true` |
+| `what-is-status` | Either | Read-only, so Claude may run it freely. |
+
+Those three `disable-model-invocation` flags are what make §7's "never draft and
+publish in the same turn" a mechanical guarantee rather than an instruction an
+agent might talk itself out of: Claude Code blocks the call outright and can
+only suggest that you run it.
+
+Antigravity, Claude Code, and any other agent read the same instructions —
+`AGENTS.md` / `CLAUDE.md` / `.agents/AGENTS.md` are exact mirrors, and
+`.agents/skills/` carries the same five skills. So you can draft in one tool,
+verify in another, and save from Antigravity without the house style drifting.
+
+If a tool does not support skills, open this playbook and follow §3–§6 directly,
+or run `npm run verify:post -- <slug>` from its terminal — the mechanical gate is
+a plain Node script with no agent in the loop.
 
 ## 9. Idea capture
 

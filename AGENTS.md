@@ -75,9 +75,12 @@ The `postbuild` script runs Pagefind automatically (`pagefind --site dist`) to g
 │   ├── unit/                # Unit tests: consts, markdown-preview, reading-time, series, studio-fs, studio, taxonomy, verify-post (8 test suites)
 │   └── integration/         # Integration tests: ai-discoverability, blog-posts, build, content-schema, ensure-build, reader-experience, rss, series (8 test suites)
 ├── docs/series/             # "What Is" series playbook, idea backlog, and per-post verification reports
-├── .claude/                 # Claude Code project config
-│   ├── commands/            # Slash commands: /what-is-draft, /what-is-verify, /what-is-publish, /what-is-status
-│   └── skills/what-is-post/ # Series authoring skill (mirrored to .agents/skills/what-is-post/)
+├── .claude/skills/          # Agent Skills (mirrored to .agents/skills/)
+│   ├── what-is-post/        # Series house style — Claude loads this automatically
+│   ├── what-is-draft/       # /what-is-draft — human-invoked
+│   ├── what-is-verify/      # /what-is-verify — human-invoked
+│   ├── what-is-publish/     # /what-is-publish — human-invoked, never auto-run
+│   └── what-is-status/      # /what-is-status — read-only, Claude may invoke
 ├── scripts/                 # Token-efficient Windows & Linux dev scripts
 │   └── verify-post.mjs      # Mechanical pre-publish gate for blog posts (npm run verify:post)
 ├── public/                  # Static assets (favicon.svg)
@@ -143,7 +146,11 @@ Series posts sort **oldest-first** (reading order), unlike every other listing o
 
 ### The "What Is …" series
 
-`docs/series/what-is-playbook.md` is the single source of truth for the series' house style, structure, front-matter, and verification gate. The skill, the slash commands, and `scripts/verify-post.mjs` all defer to it — **change the playbook, not the copies**.
+`docs/series/what-is-playbook.md` is the single source of truth for the series' house style, structure, front-matter, and verification gate. The skills and `scripts/verify-post.mjs` all defer to it — **change the playbook, not the copies**.
+
+The pipeline is built from **Agent Skills**, not the legacy `.claude/commands/` format — Anthropic merged custom commands into skills, and skills are the supported forward path. A skill directory name is the command you type, so `.claude/skills/what-is-draft/` gives you `/what-is-draft`.
+
+The three stage skills set `disable-model-invocation: true`, so Claude cannot run them on its own — it can only suggest that you do. That is what mechanically enforces the human review turn below; `/what-is-publish` in particular can never fire without you. `what-is-post` carries the house style and loads automatically when relevant, and `/what-is-status` is read-only so Claude may invoke it freely.
 
 The pipeline is deliberately three separate turns, so a human reviews between drafting and publishing:
 

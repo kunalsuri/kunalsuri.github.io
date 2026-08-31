@@ -188,7 +188,7 @@ npm run verify:post -- what-is-an-llm   # one post
 npm run verify:posts                    # every post
 ```
 
-For the "What Is" series there is a full authoring pipeline — playbook, idea backlog, Claude Code slash commands (`/what-is-draft`, `/what-is-verify`, `/what-is-publish`, `/what-is-status`), and per-post verification reports. See [`docs/series/what-is-playbook.md`](docs/series/what-is-playbook.md).
+For the "What Is" series there is a full authoring pipeline — playbook, idea backlog, per-post verification reports, and four Agent Skills in `.claude/skills/` (`/what-is-draft`, `/what-is-verify`, `/what-is-publish`, `/what-is-status`) mirrored to `.agents/skills/` for Antigravity. See [`docs/series/what-is-playbook.md`](docs/series/what-is-playbook.md).
 
 <br>
 

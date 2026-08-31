@@ -1,5 +1,6 @@
 ---
-description: Show the What Is series pipeline — published, in flight, and queued
+name: what-is-status
+description: Show the What Is series pipeline — which posts are published, drafted, verified, or still queued as ideas, plus any drift between them. Read-only; use when asked where the series stands.
 ---
 
 Report the current state of the **What Is** series pipeline. Do not modify anything.

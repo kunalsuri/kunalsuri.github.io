@@ -1,6 +1,8 @@
 ---
-description: Fact-check and structurally verify a draft post before publishing
+name: what-is-verify
+description: Fact-check and structurally verify a What Is draft before publishing, writing a source-checked review report. Run this after drafting and before publishing.
 argument-hint: <slug, e.g. what-is-an-llm>
+disable-model-invocation: true
 ---
 
 Verify the post `$ARGUMENTS` against both halves of the gate in

@@ -1,6 +1,8 @@
 ---
-description: Publish a reviewed draft — flip draft:false, run the full gate, commit
+name: what-is-publish
+description: Publish a reviewed What Is draft — flip draft:false, run the full test suite, and commit. Only the human runs this; it is the deliberate end of the pipeline.
 argument-hint: <slug, e.g. what-is-an-llm>
+disable-model-invocation: true
 ---
 
 Publish the reviewed post `$ARGUMENTS`.
@@ -13,7 +15,7 @@ Otherwise:
 
 1. Re-run `npm run verify:post -- $ARGUMENTS`; it must pass with no errors.
 2. Set `draft: false` and `pubDate` to today, unless the user named a date.
-3. Run the full verification suite: `./scripts/linux/dev-tests.sh`.
+3. Run the full verification suite: `bash scripts/linux/dev-tests.sh`.
 4. Move the post from **In flight** to **Published** in
    `docs/series/what-is-backlog.md`.
 5. Commit on the current branch with a clear message. Do not push unless asked,

@@ -1,6 +1,8 @@
 ---
-description: Draft a new "What is …?" post from a topic, as a reviewable draft
+name: what-is-draft
+description: Draft a new "What is …?" post from a topic, as a reviewable draft with draft:true. Creates files, so it is invoked deliberately rather than automatically.
 argument-hint: <topic, e.g. "an LLM" or "the difference between a Skill and a Command">
+disable-model-invocation: true
 ---
 
 Draft a new post in the **What Is** series on the topic: **$ARGUMENTS**
