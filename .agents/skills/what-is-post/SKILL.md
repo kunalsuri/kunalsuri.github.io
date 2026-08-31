@@ -1,6 +1,6 @@
 ---
 name: what-is-post
-description: Draft, verify, and publish posts in the "What Is …" series on this blog — short plain-language explainers with a fixed structure and a hard factual-verification gate. Use when the user asks to write, draft, check, review, or publish a "What is X?" post, add an idea to the What Is backlog, or work on any post carrying `series: "What Is"`. Also use when asked to start a new series on this blog.
+description: House style and workflow for this blog's "What Is …" series — short plain-language explainers with a fixed structure and a hard factual-verification gate. Use this whenever the user wants to write, draft, check, review, or publish a "What is X?" post, add an idea to the What Is backlog, work on any post whose front-matter series is What Is, or start a new post series on this blog — even if they do not mention the series by name.
 ---
 
 # Writing the "What Is …" series
