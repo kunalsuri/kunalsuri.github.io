@@ -64,6 +64,11 @@ export function ensureDistBuilt(): void {
     delete cleanEnv.NODE_OPTIONS;
     delete cleanEnv.VITEST;
     delete cleanEnv.VITEST_WORKER_ID;
+    // Vitest sets NODE_ENV=test. Leaking it into `astro build` makes
+    // `import.meta.env.PROD` false, so draft posts get built and the
+    // integration tests end up asserting against a build that is not the one
+    // deployed. Drop it and let Astro pick its own production default.
+    delete cleanEnv.NODE_ENV;
 
     execSync(`"${process.execPath}" "${astroBin}" build`, {
       cwd: path.resolve('.'),

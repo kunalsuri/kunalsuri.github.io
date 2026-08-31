@@ -38,6 +38,7 @@ const { name, posts } = Astro.props;
             category={post.data.category}
             tags={post.data.tags}
             readingTime={readingTime(post.body ?? '')}
+            series={post.data.series}
           />
         ))
       }

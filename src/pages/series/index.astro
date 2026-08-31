@@ -1,0 +1,83 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import { getAllSeries, getPostsBySeries } from '../../utils/series';
+
+const series = await getAllSeries();
+
+// Each card previews the first few posts in reading order, so the index reads
+// like a table of contents rather than a list of names.
+const withPreview = await Promise.all(
+  series.map(async (s) => ({
+    ...s,
+    posts: (await getPostsBySeries(s.slug)).slice(0, 4),
+  })),
+);
+---
+
+<BaseLayout
+  title="Series"
+  description="Running series — multi-post threads on one idea, in reading order."
+>
+  <section class="py-8">
+    <p class="eyebrow">Series</p>
+    <h1 class="display mt-4 text-4xl sm:text-5xl">Running threads</h1>
+    <p class="mt-3 max-w-2xl font-body text-muted">
+      Some ideas need more than one post. A series is an open-ended run of them,
+      listed here in reading order rather than newest-first.
+    </p>
+
+    {
+      withPreview.length === 0 ? (
+        <p class="mt-10 font-body text-muted">No series yet.</p>
+      ) : (
+        <div class="mt-10 space-y-10">
+          {withPreview.map((s) => (
+            <div class="rounded-xl border border-line p-6 transition-colors hover:border-accent">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+                <h2 class="font-display text-2xl font-extrabold tracking-tight">
+                  <a href={`/series/${s.slug}`} class="transition-colors hover:text-accent">
+                    {s.name}
+                  </a>
+                </h2>
+                <span class="font-mono text-xs text-muted">
+                  {s.count} post{s.count === 1 ? '' : 's'} &middot; latest{' '}
+                  <FormattedDate date={s.latest} />
+                </span>
+              </div>
+
+              {s.description && (
+                <p class="mt-2 max-w-2xl font-body text-muted">{s.description}</p>
+              )}
+
+              <ol class="mt-4 space-y-1.5 font-display text-sm">
+                {s.posts.map((post, index) => (
+                  <li class="flex gap-2.5">
+                    <span class="shrink-0 pt-0.5 font-mono text-xs text-muted" aria-hidden="true">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    <a
+                      href={`/blog/${post.id}/`}
+                      class="text-muted transition-colors hover:text-accent hover:underline"
+                    >
+                      {post.data.title}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+
+              <a
+                href={`/series/${s.slug}`}
+                class="mt-4 inline-block font-mono text-xs text-accent transition-colors hover:text-ink"
+              >
+                {s.count > s.posts.length
+                  ? `All ${s.count} posts →`
+                  : 'Open the series →'}
+              </a>
+            </div>
+          ))}
+        </div>
+      )
+    }
+  </section>
+</BaseLayout>

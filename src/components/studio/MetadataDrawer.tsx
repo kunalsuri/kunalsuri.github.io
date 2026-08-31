@@ -151,6 +151,44 @@ export function MetadataDrawer({ isOpen, onClose, frontmatter, onChange, activeS
                 />
               </div>
 
+              {/* Series is optional and orthogonal to category: a post can be
+                  Engineering *and* episode 3 of "What Is". Clearing the name
+                  drops seriesOrder too, so the pair never goes half-set. */}
+              <div className="grid grid-cols-[1fr_auto] gap-3">
+                <Input
+                  label="Series (optional)"
+                  value={frontmatter.series ?? ''}
+                  onInput={(e) => {
+                    const next = (e.target as HTMLInputElement).value;
+                    onChange({
+                      ...frontmatter,
+                      series: next,
+                      ...(next.trim() ? {} : { seriesOrder: undefined }),
+                    });
+                  }}
+                  placeholder="e.g. What Is"
+                />
+                <Input
+                  type="number"
+                  min={1}
+                  step={1}
+                  label="Order"
+                  value={frontmatter.seriesOrder?.toString() ?? ''}
+                  disabled={!frontmatter.series?.trim()}
+                  onInput={(e) => {
+                    const raw = (e.target as HTMLInputElement).value.trim();
+                    const parsed = Number(raw);
+                    handleFieldChange(
+                      'seriesOrder',
+                      raw && Number.isInteger(parsed) && parsed > 0 ? parsed : undefined,
+                    );
+                  }}
+                  placeholder="auto"
+                  containerClassName="w-24"
+                  className="font-mono"
+                />
+              </div>
+
               <div>
                 <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--studio-text-muted)] mb-1.5">
                   Tags ({frontmatter.tags.length})

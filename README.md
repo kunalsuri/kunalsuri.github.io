@@ -124,9 +124,11 @@ tests/
 │   ├── consts.test.ts          # Site constants — shape and value guards
 │   ├── markdown-preview.test.ts# Live markdown preview & asset URL rewrites
 │   ├── reading-time.test.ts    # readingTime() — word count and edge cases
+│   ├── series.test.ts          # Series grouping, reading order & in-post context
 │   ├── studio-fs.test.ts       # Studio local filesystem operations & post file handling
 │   ├── studio.test.ts          # Studio state & management utilities
-│   └── taxonomy.test.ts        # slugify() — URL-safe slug generation
+│   ├── taxonomy.test.ts        # slugify() — URL-safe slug generation
+│   └── verify-post.test.ts     # The mechanical pre-publish gate
 └── integration/                # File-system, reader-experience, and build-output tests
     ├── ai-discoverability.test.ts# llms.txt & llms-full.txt feeds validation
     ├── blog-posts.test.ts        # Validates actual .md/.mdx files on disk
@@ -134,7 +136,8 @@ tests/
     ├── content-schema.test.ts    # Zod schema for blog front-matter
     ├── ensure-build.ts           # Concurrency-safe build lock helper
     ├── reader-experience.test.ts # Layout, reading experience, and theme toggle guards
-    └── rss.test.ts               # RSS feed structure and content
+    ├── rss.test.ts               # RSS feed structure and content
+    └── series.test.ts            # Series routes, front-matter integrity, publish gate
 ```
 
 | Layer | What it tests | Speed |
@@ -171,6 +174,21 @@ Your content here.
 ```
 
 The filename becomes the URL slug — `my-post.md` → `/blog/my-post/`.
+
+### Post series
+
+Add `series: "What Is"` to the front-matter and the post joins a series: `/series` and `/series/what-is` build themselves, and the post gets in-article "Part 2 of 5" navigation. `series` is the *thread*; `category` is still the *section* — a post has both. Add optional `seriesOrder: 3` only when reading order must differ from publication order.
+
+### Draft → verify → publish
+
+Posts are drafted with `draft: true` (hidden in production, visible in `npm run dev`), verified, then published by flipping one boolean. The mechanical gate is a plain Node script:
+
+```bash
+npm run verify:post -- what-is-an-llm   # one post
+npm run verify:posts                    # every post
+```
+
+For the "What Is" series there is a full authoring pipeline — playbook, idea backlog, Claude Code slash commands (`/what-is-draft`, `/what-is-verify`, `/what-is-publish`, `/what-is-status`), and per-post verification reports. See [`docs/series/what-is-playbook.md`](docs/series/what-is-playbook.md).
 
 <br>
 

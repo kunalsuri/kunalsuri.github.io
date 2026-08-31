@@ -1,5 +1,6 @@
 ---
 import FormattedDate from './FormattedDate.astro';
+import { slugify } from '../utils/taxonomy';
 
 interface Props {
   url: string;
@@ -9,9 +10,10 @@ interface Props {
   category?: string;
   tags?: string[];
   readingTime?: string;
+  series?: string;
 }
 
-const { url, title, description, pubDate, category, readingTime } = Astro.props;
+const { url, title, description, pubDate, category, readingTime, series } = Astro.props;
 ---
 
 <article class="row-link border-b border-line py-6 last:border-0">
@@ -36,4 +38,15 @@ const { url, title, description, pubDate, category, readingTime } = Astro.props;
     </h3>
     <p class="mt-1.5 font-body text-muted">{description}</p>
   </a>
+
+  {
+    series && (
+      <a
+        href={`/series/${slugify(series)}`}
+        class="mt-2.5 inline-block font-mono text-[11px] uppercase tracking-wider text-muted transition-colors hover:text-accent"
+      >
+        Part of the {series} series &rarr;
+      </a>
+    )
+  }
 </article>

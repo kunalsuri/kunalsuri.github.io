@@ -26,6 +26,13 @@ export const GET: APIRoute = async () => {
       `Published: ${dateStr}`,
       `Category: ${post.data.category}`,
       `Tags: ${post.data.tags.join(', ')}`,
+      ...(post.data.series
+        ? [
+            `Series: ${post.data.series}${
+              post.data.seriesOrder ? ` (part ${post.data.seriesOrder})` : ''
+            }`,
+          ]
+        : []),
       `Description: ${post.data.description}`,
       ``,
       post.body ?? '',

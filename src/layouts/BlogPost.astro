@@ -6,7 +6,9 @@ import AudioPlayer from '../components/AudioPlayer.astro';
 import SelectionToolbar from '../components/SelectionToolbar.astro';
 import ClapButton from '../components/ClapButton.astro';
 import NewsletterCTA from '../components/NewsletterCTA.astro';
+import SeriesNav from '../components/SeriesNav.astro';
 import { slugify } from '../utils/taxonomy';
+import type { SeriesContext } from '../utils/series';
 
 interface Heading {
   depth: number;
@@ -39,6 +41,7 @@ interface Props {
   prevPost?: AdjacentPost;
   nextPost?: AdjacentPost;
   relatedPosts?: RelatedPost[];
+  seriesContext?: SeriesContext;
 }
 
 const {
@@ -53,6 +56,7 @@ const {
   prevPost,
   nextPost,
   relatedPosts = [],
+  seriesContext,
 } = Astro.props;
 
 const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
@@ -109,6 +113,17 @@ const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
             <a href={`/categories/${slugify(category)}`} class="transition-colors hover:text-accent">
               {category}
             </a>
+            {seriesContext && (
+              <>
+                <span aria-hidden="true">&middot;</span>
+                <a
+                  href={`/series/${seriesContext.slug}`}
+                  class="font-bold text-accent transition-colors hover:text-ink"
+                >
+                  {seriesContext.name} #{seriesContext.position}
+                </a>
+              </>
+            )}
             <span aria-hidden="true">&middot;</span>
             <span>Published <FormattedDate date={pubDate} /></span>
             {readingTime && (
@@ -218,9 +233,13 @@ const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
           )
         }
 
+        {seriesContext && <SeriesNav context={seriesContext} />}
+
         <div class="prose">
           <slot />
         </div>
+
+        {seriesContext && <SeriesNav context={seriesContext} />}
 
         {
           tags.length > 0 && (
