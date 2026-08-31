@@ -68,7 +68,8 @@ export async function getAllSeries(): Promise<SeriesSummary[]> {
     const name = post.data.series;
     if (!name) continue;
 
-    const slug = slugify(name);
+    const slug = slugify(name.trim());
+    if (!slug) continue;
     const found = map.get(slug);
 
     if (found) {

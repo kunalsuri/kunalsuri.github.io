@@ -35,6 +35,7 @@ export const WHAT_IS_RULES = {
   softMaxWords: 1200,
   requiredHeadings: [
     'The short answer',
+    'Why it exists',
     'How it actually works',
     'What it is not',
     'Where it breaks',
