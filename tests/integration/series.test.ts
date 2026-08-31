@@ -24,7 +24,7 @@ beforeAll(() => {
 
 /**
  * The mechanical publish gate, run against the posts that actually exist in
- * this repo. scripts/verify-post.mjs is the same code the /what-is-verify
+ * this repo. scripts/verify-post.mjs is the same code the `/what-is`
  * workflow and `npm run verify:post` call, so a draft that would embarrass us
  * fails CI rather than only failing a human's attention.
  */

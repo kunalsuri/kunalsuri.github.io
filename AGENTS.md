@@ -75,12 +75,7 @@ The `postbuild` script runs Pagefind automatically (`pagefind --site dist`) to g
 │   ├── unit/                # Unit tests: consts, markdown-preview, reading-time, series, studio-fs, studio, taxonomy, verify-post (8 test suites)
 │   └── integration/         # Integration tests: ai-discoverability, blog-posts, build, content-schema, ensure-build, reader-experience, rss, series (8 test suites)
 ├── docs/series/             # "What Is" series playbook, idea backlog, and per-post verification reports
-├── .claude/skills/          # Agent Skills (mirrored to .agents/skills/)
-│   ├── what-is-post/        # Series house style — Claude loads this automatically
-│   ├── what-is-draft/       # /what-is-draft — human-invoked
-│   ├── what-is-verify/      # /what-is-verify — human-invoked
-│   ├── what-is-publish/     # /what-is-publish — human-invoked, never auto-run
-│   └── what-is-status/      # /what-is-status — read-only, Claude may invoke
+├── .claude/skills/what-is/  # The one series skill (mirrored to .agents/skills/)
 ├── scripts/                 # Token-efficient Windows & Linux dev scripts
 │   └── verify-post.mjs      # Mechanical pre-publish gate for blog posts (npm run verify:post)
 ├── public/                  # Static assets (favicon.svg)
@@ -146,30 +141,31 @@ Series posts sort **oldest-first** (reading order), unlike every other listing o
 
 ### The "What Is …" series
 
-`docs/series/what-is-playbook.md` is the single source of truth for the series' house style, structure, front-matter, and verification gate. The skills and `scripts/verify-post.mjs` all defer to it — **change the playbook, not the copies**.
+`docs/series/what-is-playbook.md` holds the house style; `.claude/skills/what-is/SKILL.md` holds the workflow; `scripts/verify-post.mjs` holds the mechanical gate. Each fact lives in exactly one of those three — change style in the playbook, not in the copies.
 
-The pipeline is built from **Agent Skills**, not the legacy `.claude/commands/` format — Anthropic merged custom commands into skills, and skills are the supported forward path. A skill directory name is the command you type, so `.claude/skills/what-is-draft/` gives you `/what-is-draft`.
+**There is one command.** `/what-is <topic-or-slug>` works out what to do by looking at the disk, so nothing tracks pipeline state in a second place and nothing can drift:
 
-The three stage skills set `disable-model-invocation: true`, so Claude cannot run them on its own — it can only suggest that you do. That is what mechanically enforces the human review turn below; `/what-is-publish` in particular can never fire without you. `what-is-post` carries the house style and loads automatically when relevant, and `/what-is-status` is read-only so Claude may invoke it freely.
+| Stage on disk | What `/what-is` does |
+|---|---|
+| no post file | Drafts it, `draft: true`, uncertain claims marked `[?]` |
+| `draft: true`, no review file | Fact-checks it against primary sources, writes `docs/series/reviews/<slug>.md` |
+| `draft: true`, review file exists | Publishes — but only once you say go |
+| `draft: false` | Nothing; says so |
 
-The pipeline is deliberately three separate turns, so a human reviews between drafting and publishing:
+`/what-is` with no argument reports every series post's stage. `npm run verify:post -- --stage` does the same without an agent.
 
-| Stage | Command | Result |
-|---|---|---|
-| Draft | `/what-is-draft <topic>` | `src/content/blog/what-is-<slug>/index.md` with `draft: true`; uncertain claims marked `[?]` |
-| Verify | `/what-is-verify <slug>` | Mechanical gate + source-checked factual review, written to `docs/series/reviews/<slug>.md` |
-| Publish | `/what-is-publish <slug>` | `draft: false`, full test suite, commit |
-| Status | `/what-is-status` | Pipeline state and any drift |
+The skill sets `disable-model-invocation: true`, so Claude can never run it unprompted — it can only suggest that you do. That is what makes the human review turn a mechanical guarantee rather than an instruction an agent might talk itself out of.
 
 Rules that agents **must** honour:
 
 - **Never draft and publish in the same turn.** The human review turn is the point of the pipeline.
 - **Never ship a factual claim that was not checked against a current primary source this session.** Definitions assembled from memory are the exact failure this series exists to avoid.
 - **`[?]` markers block publishing.** `scripts/verify-post.mjs` treats them as hard errors. Resolve them; never strip them to pass the gate.
-- **Drafts live in `src/content/blog/` with `draft: true`**, not in `docs/drafts/`. Drafts are hidden from production builds but visible in `npm run dev`, so a post is reviewed exactly as it will look. `docs/drafts/` is only for imported or half-abandoned pieces.
+- **There is no minimum length.** A term explained clearly in 300 words is the series working. Only a soft ~1200-word ceiling warns.
+- **Drafts live in `src/content/blog/` with `draft: true`**, not in `docs/drafts/`. Drafts are hidden from production builds but visible in `npm run dev`, so a post is reviewed exactly as it will look.
 - Publishing requires an existing `docs/series/reviews/<slug>.md`.
 
-Idea capture lives in `docs/series/what-is-backlog.md` — one line per idea, deliberately unscheduled.
+`docs/series/what-is-backlog.md` is ideas only — no status tables, because the posts on disk already carry that.
 
 ## Deployment & CI/CD
 

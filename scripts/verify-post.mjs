@@ -22,14 +22,17 @@ import { load, JSON_SCHEMA } from 'js-yaml';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const BLOG_DIR = path.join(ROOT, 'src/content/blog');
+const REVIEWS_DIR = path.join(ROOT, 'docs/series/reviews');
 
 /** Structural rules for the "What Is" series, from the playbook. */
 export const WHAT_IS_RULES = {
   series: 'What Is',
   titlePattern: /^What is .+\?$/i,
   slugPrefix: 'what-is-',
-  minWords: 700,
-  maxWords: 1200,
+  // No floor. If a term can be explained clearly in 300 words, that is the
+  // series working, not failing. Only the ceiling is worth a nudge, and it is
+  // a warning rather than an error.
+  softMaxWords: 1200,
   requiredHeadings: [
     'The short answer',
     'How it actually works',
@@ -64,6 +67,34 @@ function countWords(body) {
     .replace(/^#{1,6} .*$/gm, ' ')
     .replace(/[#*_>`|-]/g, ' ');
   return prose.split(/\s+/).filter(Boolean).length;
+}
+
+/**
+ * Where a post sits in the pipeline, derived entirely from what is on disk.
+ * Nothing tracks this in a second place, so nothing can drift out of sync:
+ *   idea      — no post file yet (only ever reported for a slug you asked for)
+ *   draft     — draft: true, no review report
+ *   verified  — draft: true, review report exists
+ *   published — draft: false
+ */
+export function stageOf(post) {
+  if (!post) return 'idea';
+  if (post.frontmatter?.draft !== true) return 'published';
+  return fs.existsSync(path.join(REVIEWS_DIR, `${post.slug}.md`)) ? 'verified' : 'draft';
+}
+
+/** The single next action for a post at a given stage. */
+export function nextAction(stage, slug) {
+  switch (stage) {
+    case 'idea':
+      return `no draft yet — run /what-is ${slug || '<topic>'} to write one`;
+    case 'draft':
+      return `drafted but unverified — run /what-is ${slug} to fact-check it`;
+    case 'verified':
+      return `verified and awaiting your OK — run /what-is ${slug} to publish`;
+    default:
+      return 'published — nothing to do';
+  }
 }
 
 /** Every post on disk, as { slug, file, frontmatter, body }. */
@@ -188,11 +219,9 @@ export function verifyPost(post, siblings = []) {
     }
 
     const words = countWords(body);
-    if (words < WHAT_IS_RULES.minWords) {
-      errors.push(`${words} words — below the ${WHAT_IS_RULES.minWords}-word floor for the series`);
-    } else if (words > WHAT_IS_RULES.maxWords) {
+    if (words > WHAT_IS_RULES.softMaxWords) {
       warnings.push(
-        `${words} words — over the ${WHAT_IS_RULES.maxWords}-word ceiling; consider whether this is an essay rather than a What Is post`,
+        `${words} words — over the ${WHAT_IS_RULES.softMaxWords}-word ceiling; consider whether this is an essay rather than a What Is post`,
       );
     }
   }
@@ -206,8 +235,33 @@ export function verifyPost(post, siblings = []) {
 
 // --- CLI ---------------------------------------------------------------
 
+/** `--stage` prints where every series post sits, derived from disk alone. */
+function printStages(posts) {
+  const series = posts
+    .filter((p) => p.frontmatter?.series)
+    .sort((a, b) => String(a.slug).localeCompare(String(b.slug)));
+
+  if (series.length === 0) {
+    console.log('\nNo series posts yet.\n');
+    return 0;
+  }
+
+  console.log('');
+  for (const post of series) {
+    const stage = stageOf(post);
+    console.log(`  ${stage.padEnd(9)} ${post.slug}`);
+    console.log(`            -> ${nextAction(stage, post.slug)}`);
+  }
+  console.log('');
+  return 0;
+}
+
 function main(argv) {
   const posts = collectPosts();
+
+  if (argv.includes('--stage')) {
+    return printStages(posts);
+  }
   let targets = posts;
   let label = 'all posts';
 
@@ -247,7 +301,7 @@ function main(argv) {
   for (const post of targets) {
     const { errors, warnings } = verifyPost(post, posts);
     const mark = errors.length === 0 ? (warnings.length === 0 ? 'PASS' : 'PASS*') : 'FAIL';
-    console.log(`  [${mark}] ${post.slug}  (${post.file})`);
+    console.log(`  [${mark}] ${post.slug}  (${stageOf(post)})`);
     for (const e of errors) console.log(`      error:   ${e}`);
     for (const w of warnings) console.log(`      warning: ${w}`);
     if (errors.length > 0) failed += 1;

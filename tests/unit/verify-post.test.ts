@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 // Plain .mjs script — deliberately untyped, shared with the CLI gate.
-import { verifyPost, WHAT_IS_RULES } from '../../scripts/verify-post.mjs';
+import { verifyPost, stageOf, nextAction, WHAT_IS_RULES } from '../../scripts/verify-post.mjs';
 
 /**
  * These cover the mechanical publish gate in scripts/verify-post.mjs — the
@@ -174,9 +174,9 @@ describe('verifyPost — What Is house style', () => {
     expect(run(makePost({}, body)).errors).toEqual([]);
   });
 
-  it('fails a post below the word floor', () => {
-    const result = run(makePost({}, whatIsBody(100)));
-    expect(result.errors.join(' ')).toMatch(/below the 700-word floor/);
+  it('accepts a short post — brevity is the goal, not a failure', () => {
+    const result = run(makePost({}, whatIsBody(120)));
+    expect(result.errors).toEqual([]);
   });
 
   it('warns — but does not fail — above the word ceiling', () => {
@@ -186,9 +186,10 @@ describe('verifyPost — What Is house style', () => {
   });
 
   it('excludes fenced code blocks from the word count', () => {
-    const code = '```js\n' + Array.from({ length: 400 }, (_, i) => `const v${i} = ${i};`).join('\n') + '\n```';
+    // 1400 prose words would trip the ceiling; wrapped in a fence it must not.
+    const code = '```js\n' + Array.from({ length: 1400 }, (_, i) => `word${i}`).join(' ') + '\n```';
     const result = run(makePost({}, `${whatIsBody(300)}\n\n${code}`));
-    expect(result.errors.join(' ')).toMatch(/below the 700-word floor/);
+    expect(result.warnings.join(' ')).not.toMatch(/word ceiling/);
   });
 
   it('does not apply What Is structural rules to other series', () => {
@@ -201,6 +202,28 @@ describe('verifyPost — What Is house style', () => {
     const post = makePost({ series: undefined, title: 'A standalone essay' }, 'Short.');
     post.slug = 'a-standalone-essay';
     expect(run(post).errors).toEqual([]);
+  });
+});
+
+describe('stageOf — the disk is the only source of truth', () => {
+  it('reports published for a post with draft:false', () => {
+    expect(stageOf(makePost({ draft: false }))).toBe('published');
+  });
+
+  it('reports draft for draft:true with no review report', () => {
+    const post = makePost({ draft: true });
+    post.slug = 'what-is-something-never-reviewed';
+    expect(stageOf(post)).toBe('draft');
+  });
+
+  it('reports idea for a post that does not exist', () => {
+    expect(stageOf(undefined)).toBe('idea');
+  });
+
+  it('gives a next action for every stage', () => {
+    for (const stage of ['idea', 'draft', 'verified', 'published']) {
+      expect(nextAction(stage, 'what-is-x')).toBeTruthy();
+    }
   });
 });
 

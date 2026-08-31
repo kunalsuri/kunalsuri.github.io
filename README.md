@@ -188,7 +188,7 @@ npm run verify:post -- what-is-an-llm   # one post
 npm run verify:posts                    # every post
 ```
 
-For the "What Is" series there is a full authoring pipeline — playbook, idea backlog, per-post verification reports, and four Agent Skills in `.claude/skills/` (`/what-is-draft`, `/what-is-verify`, `/what-is-publish`, `/what-is-status`) mirrored to `.agents/skills/` for Antigravity. See [`docs/series/what-is-playbook.md`](docs/series/what-is-playbook.md).
+For the "What Is" series there is one command — `/what-is <topic-or-slug>` — which reads the disk to work out whether the post needs drafting, fact-checking, or publishing, so you never have to track the stage yourself. `npm run verify:post -- --stage` shows the same thing without an agent. See [`docs/series/what-is-playbook.md`](docs/series/what-is-playbook.md).
 
 <br>
 
