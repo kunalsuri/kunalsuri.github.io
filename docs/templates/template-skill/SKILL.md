@@ -1,16 +1,15 @@
 ---
 name: your-skill-name
 description: >
-  Concise description of what this skill does and when to use it.
-  Use when the user asks about [specific triggers]. Include keywords
-  that help agents identify relevant tasks.
-# --- Optional fields below ---
-# license: Apache-2.0
-# compatibility: Requires Python 3.12+ and uv
-# metadata:
-#   author: your-name
-#   version: "1.0"
-# allowed-tools: Bash(git:*) Read
+  Concise, action-oriented description of what this skill does and when to use it.
+  Use when the user asks about [specific triggers, keywords, or workflows].
+license: Apache-2.0
+compatibility: Requires Python 3.8+ / Node.js 20+
+metadata:
+  author: "Your Name or Org"
+  version: "1.0.0"
+  spec-version: "1.0.0"
+# allowed-tools: Bash Read
 ---
 
 <!-- ================================================================

@@ -15,7 +15,8 @@
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
     "verify:post": "node scripts/verify-post.mjs",
-    "verify:posts": "node scripts/verify-post.mjs --all"
+    "verify:posts": "node scripts/verify-post.mjs --all",
+    "publish:draft": "python scripts/publish-draft.py"
   },
   "dependencies": {
     "@astrojs/mdx": "^7.0.8",

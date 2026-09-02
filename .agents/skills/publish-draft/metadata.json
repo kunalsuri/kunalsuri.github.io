@@ -1,0 +1,24 @@
+{
+  "$schema": "https://agentskills.io/schemas/skill-template.json",
+  "name": "publish-draft",
+  "specStandard": "Agent Skills Open Standard (agentskills.io)",
+  "specVersion": "1.0.0",
+  "lastSynced": "2026-09-02T16:55:00+02:00",
+  "supportedClients": [
+    "Google Antigravity / Gemini IDE (.agents/skills/)",
+    "Claude Code (.claude/skills/ / .agents/skills/)",
+    "GitHub Copilot in VS Code (.agents/skills/ / /skills)",
+    "OpenAI Codex / Agents"
+  ],
+  "validationRules": {
+    "namePattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+    "nameLengthMax": 64,
+    "descriptionLengthMax": 1024,
+    "compatibilityLengthMax": 500
+  },
+  "directoryLayout": {
+    "entrypoint": "SKILL.md",
+    "scripts": "scripts/publish_draft.py",
+    "references": "references/REFERENCE.md"
+  }
+}

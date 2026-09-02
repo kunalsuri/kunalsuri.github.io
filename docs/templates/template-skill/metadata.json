@@ -1,0 +1,34 @@
+{
+  "$schema": "https://agentskills.io/schemas/skill-template.json",
+  "templateName": "agent-skill-starter",
+  "specStandard": "Agent Skills Open Standard (agentskills.io)",
+  "specVersion": "1.0.0",
+  "lastSynced": "2026-09-02T16:35:00+02:00",
+  "upstreamSources": {
+    "home": "https://agentskills.io/",
+    "quickstart": "https://agentskills.io/skill-creation/quickstart",
+    "specification": "https://agentskills.io/specification",
+    "bestPractices": "https://agentskills.io/skill-creation/best-practices",
+    "usingScripts": "https://agentskills.io/skill-creation/using-scripts",
+    "optimizingDescriptions": "https://agentskills.io/skill-creation/optimizing-descriptions",
+    "evaluatingSkills": "https://agentskills.io/skill-creation/evaluating-skills"
+  },
+  "supportedClients": [
+    "Google Antigravity / Gemini IDE (.agents/skills/)",
+    "Claude Code (.claude/skills/ / .agents/skills/)",
+    "GitHub Copilot in VS Code (.agents/skills/ / /skills)",
+    "OpenAI Codex / Agents"
+  ],
+  "validationRules": {
+    "namePattern": "^[a-z0-9]+(-[a-z0-9]+)*$",
+    "nameLengthMax": 64,
+    "descriptionLengthMax": 1024,
+    "compatibilityLengthMax": 500
+  },
+  "directoryLayout": {
+    "entrypoint": "SKILL.md",
+    "scripts": "scripts/",
+    "references": "references/",
+    "assets": "assets/"
+  }
+}

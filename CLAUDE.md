@@ -41,6 +41,7 @@ npm run test:unit    # Fast unit tests only (tests/unit)
 npm run test:integration # Integration tests only (tests/integration)
 npm run verify:post -- <slug>  # Mechanical pre-publish gate for one post
 npm run verify:posts     # Same gate across every post
+npm run publish:draft    # Move & publish draft folder from docs/drafts/ to src/content/blog/
 npm run build        # Production build to dist/
 npm run dev          # Start dev server at http://localhost:4321
 npm run preview      # Preview the built site locally
@@ -58,7 +59,7 @@ The `postbuild` script runs Pagefind automatically (`pagefind --site dist`) to g
 ├── package.json             # Scripts, deps (Astro 7, Preact, Tailwind v4, Pagefind, Vitest)
 ├── AGENTS.md                # Agent instructions (mirrored with CLAUDE.md & .agents/AGENTS.md)
 ├── CLAUDE.md                # Claude Code instructions (mirrored with AGENTS.md)
-├── .agents/                 # Workspace customizations root
+├── .agents/                 # Workspace customizations root (skills: what-is, publish-draft)
 │   └── AGENTS.md            # Anti-gravity workspace agent instructions
 ├── CHANGELOG.md             # Keep a Changelog release notes
 ├── SECURITY.md              # Security vulnerability reporting & automated tooling policies
@@ -74,9 +75,11 @@ The `postbuild` script runs Pagefind automatically (`pagefind --site dist`) to g
 ├── tests/                   # Vitest test suite
 │   ├── unit/                # Unit tests: consts, markdown-preview, reading-time, series, studio-fs, studio, taxonomy, verify-post (8 test suites)
 │   └── integration/         # Integration tests: ai-discoverability, blog-posts, build, content-schema, ensure-build, reader-experience, rss, series (8 test suites)
+├── docs/drafts/             # Optional draft holding workspace before promotion
 ├── docs/series/             # "What Is" series playbook, idea backlog, and per-post verification reports
-├── .claude/skills/what-is/  # The one series skill (mirrored to .agents/skills/)
+├── .claude/skills/          # Skills: what-is, publish-draft (mirrored to .agents/skills/)
 ├── scripts/                 # Token-efficient Windows & Linux dev scripts
+│   ├── publish-draft.py     # Move & publish draft folder to src/content/blog/<slug>/index.md
 │   └── verify-post.mjs      # Mechanical pre-publish gate for blog posts (npm run verify:post)
 ├── public/                  # Static assets (favicon.svg)
 ├── .github/                 # dependabot.yml (weekly updates) & workflows/ (ci.yml, codeql-analysis.yml, deploy.yml, dependabot-automerge.yml)
