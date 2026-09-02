@@ -60,4 +60,15 @@ describe('Studio markdown live preview', () => {
     expect(html).toContain('<br>');
     expect(html).not.toContain('&lt;br&gt;');
   });
+
+  it('renders bookmark card syntax with valid class attributes', () => {
+    const cardMarkdown = '[bookmark:Astro Framework](https://astro.build "astro.build|The web framework for content-driven websites|https://astro.build/og.png")';
+    const html = renderPreviewHtml(cardMarkdown, ASSET_BASE);
+    expect(html).toContain('class="studio-bookmark-card');
+    expect(html).toContain('class="flex-1 min-w-0"');
+    expect(html).not.toContain('className="');
+    expect(html).toContain('href="https://astro.build"');
+    expect(html).toContain('Astro Framework');
+    expect(html).toContain('astro.build');
+  });
 });

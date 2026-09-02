@@ -66,7 +66,7 @@ export function renderPreviewHtml(markdown: string, assetBaseUrl: string): strin
       const img = parts[2] || '';
 
       return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="studio-bookmark-card my-4 flex items-center justify-between gap-4 rounded-xl border border-[var(--studio-border)] bg-[var(--studio-bg-card)] p-4 no-underline transition-all hover:border-[var(--studio-accent)] hover:shadow-md">
-        <div className="flex-1 min-w-0">
+        <div class="flex-1 min-w-0">
           <div class="text-xs font-semibold text-[var(--studio-accent)] uppercase tracking-wider mb-1">${domain}</div>
           <div class="text-sm font-bold text-[var(--studio-text-primary)] truncate">${title}</div>
           ${desc ? `<div class="text-xs text-[var(--studio-text-muted)] line-clamp-2 mt-1">${desc}</div>` : ''}

@@ -45,7 +45,7 @@ export function SelectionFloatingToolbar({
             value={linkUrl}
             onInput={(e) => setLinkUrl((e.target as HTMLInputElement).value)}
             placeholder="Paste or type URL..."
-            className="w-48 rounded-md border border-[var(--studio-border)] bg-[var(--studio-bg-canvas)] px-2 py-1 text-xs text-[var(--studio-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--studio-accent)] font-mono"
+            className="w-48 rounded-md border border-[var(--studio-border)] bg-[var(--studio-bg)] px-2 py-1 text-xs text-[var(--studio-text-primary)] focus:outline-none focus:ring-1 focus:ring-[var(--studio-accent)] font-mono"
             autoFocus
           />
           <button
@@ -99,7 +99,7 @@ export function SelectionFloatingToolbar({
             type="button"
             onClick={onClose}
             title="Dismiss"
-            className="rounded-md p-1 text-[var(--studio-text-muted)] hover:text-[var(--studio-text-primary)] hover:bg-[var(--studio-bg-canvas)]"
+            className="rounded-md p-1 text-[var(--studio-text-muted)] hover:text-[var(--studio-text-primary)] hover:bg-[var(--studio-bg)]"
           >
             <Icon name="close" size={14} />
           </button>
@@ -124,7 +124,7 @@ function ToolbarButton({
       onClick={onClick}
       title={label}
       aria-label={label}
-      className="flex items-center justify-center rounded-lg p-1.5 text-[var(--studio-text-muted)] hover:bg-[var(--studio-bg-canvas)] hover:text-[var(--studio-accent)] transition-colors"
+      className="flex items-center justify-center rounded-lg p-1.5 text-[var(--studio-text-muted)] hover:bg-[var(--studio-bg)] hover:text-[var(--studio-accent)] transition-colors"
     >
       <Icon name={icon} size={15} />
     </button>

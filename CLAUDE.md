@@ -73,8 +73,8 @@ The `postbuild` script runs Pagefind automatically (`pagefind --site dist`) to g
 │   ├── utils/               # posts.ts (query helpers), reading-time.ts, taxonomy.ts (tag/category extraction), series.ts (series ordering & context), studio-fs.ts
 │   └── content/blog/        # Blog posts as .md / .mdx — filename or folder/index.md = URL slug
 ├── tests/                   # Vitest test suite
-│   ├── unit/                # Unit tests: consts, markdown-preview, reading-time, series, studio-fs, studio, taxonomy, verify-post (8 test suites)
-│   └── integration/         # Integration tests: ai-discoverability, blog-posts, build, content-schema, ensure-build, reader-experience, rss, series (8 test suites)
+│   ├── unit/                # Unit tests: consts, markdown-preview, publish-draft, reading-time, series, studio-fs, studio, taxonomy, verify-post (9 test suites)
+│   └── integration/         # Integration tests: ai-discoverability, blog-posts, build, content-schema, ensure-build, reader-experience, rss, series (7 test suites)
 ├── docs/drafts/             # Optional draft holding workspace before promotion
 ├── docs/series/             # "What Is" series playbook, idea backlog, and per-post verification reports
 ├── .claude/skills/          # Skills: what-is, publish-draft (mirrored to .agents/skills/)
@@ -126,8 +126,8 @@ Before marking work complete, agents **must** run the consolidated verification 
 
 This script executes all 4 required gates in one pass:
 1. `npm run check` — type check (zero errors)
-2. `npm run test:unit` — unit tests (8 test suites)
-3. `npm run test:integration` — integration tests (8 test suites)
+2. `npm run test:unit` — unit tests (9 test suites)
+3. `npm run test:integration` — integration tests (7 test suites)
 4. `npm run build` — production build (+ Pagefind index)
 
 For blog content specifically, also run `npm run verify:post -- <slug>` — the mechanical publish gate (schema shape, house-style structure, length, leftover placeholders). It runs inside `tests/integration/series.test.ts` too, so a malformed post fails CI.

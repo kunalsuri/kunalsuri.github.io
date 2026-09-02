@@ -211,6 +211,34 @@ export function studioServerPlugin() {
           return;
         }
 
+        if (pathname === '/api/studio/images/upload' && req.method === 'POST') {
+          try {
+            const bodyBuffer = await readRequestBody(req);
+            const mod = await server.ssrLoadModule('/src/pages/api/studio/images/upload.ts');
+            const fetchReq = toFetchRequest(req, bodyBuffer);
+            const response = await mod.POST({ request: fetchReq, url: new URL(fetchReq.url), params: {} });
+            await sendFetchResponse(res, response);
+          } catch (err) {
+            console.error('[studio-server] image upload error:', err);
+            sendJson(res, 500, { error: 'Image upload failed' });
+          }
+          return;
+        }
+
+        if (pathname === '/api/studio/unfurl' && req.method === 'POST') {
+          try {
+            const bodyBuffer = await readRequestBody(req);
+            const mod = await server.ssrLoadModule('/src/pages/api/studio/unfurl.ts');
+            const fetchReq = toFetchRequest(req, bodyBuffer);
+            const response = await mod.POST({ request: fetchReq, url: new URL(fetchReq.url), params: {} });
+            await sendFetchResponse(res, response);
+          } catch (err) {
+            console.error('[studio-server] unfurl error:', err);
+            sendJson(res, 500, { error: 'Unfurl failed' });
+          }
+          return;
+        }
+
         next();
       });
     },

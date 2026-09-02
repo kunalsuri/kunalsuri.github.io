@@ -2,7 +2,7 @@
 
 # 🚀 Kunal's Personal Page
 
-**Essasys, Opinions and Ideas on Philosophy, Leadership, AI, Tech and whatever I am building...**
+**Essays, Opinions and Ideas on Philosophy, Leadership, AI, Tech and whatever I am building...**
 
 <br>
 
@@ -123,6 +123,7 @@ tests/
 ├── unit/                       # Fast, pure-function & module tests (no Astro runtime)
 │   ├── consts.test.ts          # Site constants — shape and value guards
 │   ├── markdown-preview.test.ts# Live markdown preview & asset URL rewrites
+│   ├── publish-draft.test.ts   # Draft publishing CLI & skill schema conformance
 │   ├── reading-time.test.ts    # readingTime() — word count and edge cases
 │   ├── series.test.ts          # Series grouping, reading order & in-post context
 │   ├── studio-fs.test.ts       # Studio local filesystem operations & post file handling
