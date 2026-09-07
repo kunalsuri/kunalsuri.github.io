@@ -19,11 +19,11 @@
     "publish:draft": "python scripts/publish-draft.py"
   },
   "dependencies": {
-    "@astrojs/mdx": "^7.0.8",
+    "@astrojs/mdx": "^8.0.0",
     "@astrojs/preact": "^6.0.4",
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.3",
-    "astro": "^7.2.9",
+    "astro": "^7.3.1",
     "js-yaml": "^5.4.1",
     "preact": "^10.29.8",
     "rehype-stringify": "^10.0.1",
