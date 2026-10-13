@@ -24,7 +24,7 @@
     "@astrojs/rss": "^4.0.19",
     "@astrojs/sitemap": "^3.7.3",
     "astro": "^7.3.8",
-    "js-yaml": "^5.4.2",
+    "js-yaml": "^5.4.3",
     "preact": "^11.0.1",
     "rehype-stringify": "^10.0.1",
     "remark-gfm": "^4.0.1",
